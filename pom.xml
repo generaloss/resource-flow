@@ -6,10 +6,10 @@
     <groupId>io.github.generaloss</groupId>
     <artifactId>resource-flow</artifactId>
     <version>25.8.1-SNAPSHOT-1</version>
-    <name>resource-flow</name>
+    <name>${artifactId}</name>
 
     <description>Resources Library</description>
-    <url>https://github.com/generaloss/resource-flow</url>
+    <url>https://github.com/generaloss/${artifactId}</url>
 
     <dependencies>
         <!-- provided -->
@@ -41,9 +41,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git://github.com/generaloss/resource-flow.git</connection>
-        <developerConnection>scm:git:ssh://github.com:generaloss/resource-flow.git</developerConnection>
-        <url>https://github.com/generaloss/resource-flow/tree/master</url>
+        <connection>scm:git:git://github.com/generaloss/${artifactId}.git</connection>
+        <developerConnection>scm:git:ssh://github.com:generaloss/${artifactId}.git</developerConnection>
+        <url>https://github.com/generaloss/${artifactId}/tree/master</url>
     </scm>
 
     <developers>
@@ -117,6 +117,7 @@
                 <version>0.3.0</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <deploymentName>${artifactId}:${version}</deploymentName>
                     <publishingServerId>central</publishingServerId>
                     <tokenAuth>true</tokenAuth>
                 </configuration>
