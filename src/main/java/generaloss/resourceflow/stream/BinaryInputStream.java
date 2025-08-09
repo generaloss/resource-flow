@@ -25,7 +25,8 @@ public class BinaryInputStream extends DataInputStream {
 
     public String readByteString() throws IOException {
         final int length = super.readInt();
-        return new String(super.readNBytes(length));
+        final byte[] bytes = this.readBytes(length);
+        return new String(bytes);
     }
 
     public String readCharString() throws IOException {

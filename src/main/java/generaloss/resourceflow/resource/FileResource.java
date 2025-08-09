@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileResource extends Resource {
 
@@ -23,7 +24,7 @@ public class FileResource extends Resource {
     }
 
     protected FileResource(String path) {
-        this(Path.of(ResUtils.osGeneralizePath(path)).normalize());
+        this(Paths.get(ResUtils.osGeneralizePath(path)).normalize());
     }
 
     protected FileResource(File parent, String child) {
@@ -93,7 +94,7 @@ public class FileResource extends Resource {
     }
 
     public FileResource move(String targetPath, CopyOption... options) {
-        return this.move(Path.of(targetPath), options);
+        return this.move(Paths.get(targetPath), options);
     }
 
 
@@ -108,7 +109,7 @@ public class FileResource extends Resource {
     }
 
     public FileResource copy(String targetPath, CopyOption... options) {
-        return this.copy(Path.of(targetPath), options);
+        return this.copy(Paths.get(targetPath), options);
     }
 
 
