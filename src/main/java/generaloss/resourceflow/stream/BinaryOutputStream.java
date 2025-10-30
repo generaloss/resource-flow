@@ -347,42 +347,63 @@ public class BinaryOutputStream extends DataOutputStream {
 
 
     public void writeByteBuffer(ByteBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeByte(buffer.get(i));
     }
 
     public void writeShortBuffer(ShortBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeShort(buffer.get(i));
     }
 
     public void writeIntBuffer(IntBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeInt(buffer.get(i));
     }
 
     public void writeLongBuffer(LongBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeLong(buffer.get(i));
     }
 
     public void writeFloatBuffer(FloatBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeFloat(buffer.get(i));
     }
 
     public void writeDoubleBuffer(DoubleBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeDouble(buffer.get(i));
     }
 
     public void writeCharBuffer(CharBuffer buffer) throws IOException {
+        if(buffer == null)
+            throw new IllegalArgumentException("Argument 'buffer' cannot be null");
+
         super.writeInt(buffer.remaining());
         for(int i = buffer.position(); i < buffer.limit(); i++)
             super.writeChar(buffer.get(i));
@@ -390,84 +411,127 @@ public class BinaryOutputStream extends DataOutputStream {
 
 
     public void writeBoolList(BoolList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeBoolArray(list.array());
     }
 
     public void writeByteList(ByteList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeByteArray(list.array());
     }
 
     public void writeCharList(CharList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeCharArray(list.array());
     }
 
     public void writeDoubleList(DoubleList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeDoubleArray(list.array());
     }
 
     public void writeFloatList(FloatList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeFloatArray(list.array());
     }
 
     public void writeIntList(IntList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeIntArray(list.array());
     }
 
     public void writeLongList(LongList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeLongArray(list.array());
     }
 
     public void writeShortList(ShortList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeShortArray(list.array());
     }
 
     public void writeByteStringList(StringList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeByteStringArray(list.array());
     }
 
     public void writeCharStringList(StringList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeCharStringArray(list.array());
     }
 
     public void writeUTFStringList(StringList list) throws IOException {
+        if(list == null)
+            throw new IllegalArgumentException("Argument 'list' cannot be null");
         this.writeUTFStringArray(list.array());
     }
 
 
     public void writeVec2i(Vec2i vector) throws IOException {
-       super.writeInt(vector.x);
-       super.writeInt(vector.y);
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
+        super.writeInt(vector.x);
+        super.writeInt(vector.y);
     }
 
     public void writeVec2f(Vec2f vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeFloat(vector.x);
         super.writeFloat(vector.y);
     }
 
     public void writeVec2d(Vec2d vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeDouble(vector.x);
         super.writeDouble(vector.y);
     }
 
     public void writeVec3i(Vec3i vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeInt(vector.x);
         super.writeInt(vector.y);
         super.writeInt(vector.z);
     }
 
     public void writeVec3f(Vec3f vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeFloat(vector.x);
         super.writeFloat(vector.y);
         super.writeFloat(vector.z);
     }
 
     public void writeVec3d(Vec3d vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeDouble(vector.x);
         super.writeDouble(vector.y);
         super.writeDouble(vector.z);
     }
 
     public void writeVec4i(Vec4i vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeInt(vector.x);
         super.writeInt(vector.y);
         super.writeInt(vector.z);
@@ -475,6 +539,9 @@ public class BinaryOutputStream extends DataOutputStream {
     }
 
     public void writeVec4f(Vec4f vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeFloat(vector.x);
         super.writeFloat(vector.y);
         super.writeFloat(vector.z);
@@ -482,6 +549,9 @@ public class BinaryOutputStream extends DataOutputStream {
     }
 
     public void writeVec4d(Vec4d vector) throws IOException {
+        if(vector == null)
+            throw new IllegalArgumentException("Argument 'vector' cannot be null");
+
         super.writeDouble(vector.x);
         super.writeDouble(vector.y);
         super.writeDouble(vector.z);
@@ -490,12 +560,18 @@ public class BinaryOutputStream extends DataOutputStream {
 
 
     public void writeEulerAngles(EulerAngles eulerAngles) throws IOException {
+        if(eulerAngles == null)
+            throw new IllegalArgumentException("Argument 'eulerAngles' cannot be null");
+
         super.writeFloat(eulerAngles.yaw);
         super.writeFloat(eulerAngles.pitch);
         super.writeFloat(eulerAngles.roll);
     }
 
     public void writeQuaternion(Quaternion quaternion) throws IOException {
+        if(quaternion == null)
+            throw new IllegalArgumentException("Argument 'quaternion' cannot be null");
+
         super.writeFloat(quaternion.w);
         super.writeFloat(quaternion.x);
         super.writeFloat(quaternion.y);
@@ -503,6 +579,9 @@ public class BinaryOutputStream extends DataOutputStream {
     }
 
     public void writeUUID(UUID uuid) throws IOException {
+        if(uuid == null)
+            throw new IllegalArgumentException("Argument 'uuid' cannot be null");
+
         super.writeLong(uuid.getMostSignificantBits());
         super.writeLong(uuid.getLeastSignificantBits());
     }

@@ -4,6 +4,7 @@ import generaloss.resourceflow.ResUtils;
 import generaloss.resourceflow.stream.BinaryOutputStream;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.CopyOption;
@@ -20,16 +21,24 @@ public class FileResource extends Resource {
     }
 
     protected FileResource(Path path) {
-        this(path.toFile());
+        this.file = path.toFile();
     }
 
-    protected FileResource(String path) {
-        this(Paths.get(ResUtils.osGeneralizePath(path)).normalize());
+    protected FileResource(String pathStr) {
+        pathStr = ResUtils.osGeneralizePath(pathStr);
+        final Path path = Paths.get(pathStr).normalize();
+
+        this.file = path.toFile();
     }
 
     protected FileResource(File parent, String child) {
-        this(new File(parent, child));
+        this.file = new File(parent, child);
     }
+
+    protected FileResource(URI uri) {
+        this.file = new File(uri);
+    }
+
 
     public File file() {
         return file;
@@ -37,11 +46,20 @@ public class FileResource extends Resource {
 
 
     public boolean create() {
-        try{
+        try {
             return file.createNewFile();
-        }catch(IOException ignored){
+        } catch(IOException ignored) {
             return false;
         }
+    }
+
+    public boolean createWithParents() {
+        final File parent = file.getParentFile();
+        if(parent == null)
+            return false;
+
+        parent.mkdirs();
+        return this.create();
     }
 
     public boolean mkdir() {
@@ -50,16 +68,6 @@ public class FileResource extends Resource {
 
     public boolean mkdirs() {
         return file.mkdirs();
-    }
-
-    /** Creates all directories and file */
-    public boolean createWithParents() {
-        final File parent = file.getParentFile();
-        if(parent != null){
-            parent.mkdirs();
-            return this.create();
-        }
-        return false;
     }
 
 
@@ -73,8 +81,12 @@ public class FileResource extends Resource {
 
     public FileResource rename(String name, boolean overwrite) {
         final File dst = new File(file.getParentFile(), name);
-        if(!overwrite && dst.exists() || !this.renameTo(dst))
-            return null;
+
+        if(!overwrite && dst.exists())
+            return this;
+        if(!this.renameTo(dst))
+            return this;
+
         return new FileResource(dst);
     }
 
@@ -83,32 +95,24 @@ public class FileResource extends Resource {
     }
 
 
-    public FileResource move(Path target, CopyOption... options) {
-        try{
-            target = target.normalize();
-            Files.move(file.toPath(), target, options);
-            return new FileResource(target);
-        }catch(IOException e){
-            throw new RuntimeException("Cannot move file '" + file + "' to '" + target + "'");
-        }
+    public FileResource move(Path target, CopyOption... options) throws IOException {
+        target = target.normalize();
+        Files.move(file.toPath(), target, options);
+        return new FileResource(target);
     }
 
-    public FileResource move(String targetPath, CopyOption... options) {
+    public FileResource move(String targetPath, CopyOption... options) throws IOException {
         return this.move(Paths.get(targetPath), options);
     }
 
 
-    public FileResource copy(Path target, CopyOption... options) {
-        try{
-            target = target.normalize();
-            Files.copy(file.toPath(), target, options);
-            return new FileResource(target);
-        }catch(IOException e){
-            throw new RuntimeException("Cannot copy file '" + file + "' to '" + target + "'");
-        }
+    public FileResource copy(Path target, CopyOption... options) throws IOException {
+        target = target.normalize();
+        Files.copy(file.toPath(), target, options);
+        return new FileResource(target);
     }
 
-    public FileResource copy(String targetPath, CopyOption... options) {
+    public FileResource copy(String targetPath, CopyOption... options) throws IOException {
         return this.copy(Paths.get(targetPath), options);
     }
 
@@ -154,7 +158,8 @@ public class FileResource extends Resource {
     }
 
     public FileResource child(String name) {
-        return new FileResource(this.childFile(name));
+        final File childFile = this.childFile(name);
+        return new FileResource(childFile);
     }
 
     public FileResource createChildFile(String name) {
@@ -172,11 +177,11 @@ public class FileResource extends Resource {
     }
 
 
-    public FileOutputStream outStream() {
-        try{
+    public FileOutputStream outStream() throws ResourceAccessException {
+        try {
             return new FileOutputStream(file);
-        }catch(FileNotFoundException e){
-            throw new RuntimeException(e);
+        } catch(FileNotFoundException e) {
+            throw new ResourceAccessException(e);
         }
     }
 
@@ -198,29 +203,31 @@ public class FileResource extends Resource {
     }
 
 
-    public void writeBytes(byte[] bytes) {
-        try(final FileOutputStream out = this.outStream()){
+    public boolean writeBytes(byte[] bytes) {
+        try(FileOutputStream out = this.outStream()) {
             out.write(bytes);
             out.flush();
-        }catch(IOException e){
-            throw new RuntimeException(e);
+
+            return true;
+        } catch(IOException e) {
+            return false;
         }
     }
 
-    public void writeString(String string, Charset charset) {
-        this.writeBytes(string.getBytes(charset));
+    public boolean writeString(String string, Charset charset) {
+        return this.writeBytes(string.getBytes(charset));
     }
 
-    public void writeString(String string) {
-        this.writeString(string, StandardCharsets.UTF_8);
+    public boolean writeString(String string) {
+        return this.writeString(string, StandardCharsets.UTF_8);
     }
 
-    public void appendString(String string, Charset charset) {
-        this.writeString(this.readString() + string, charset);
+    public boolean appendString(String string, Charset charset) {
+        return this.writeString(this.readString() + string, charset);
     }
 
-    public void appendString(String string) {
-        this.appendString(string, StandardCharsets.UTF_8);
+    public boolean appendString(String string) {
+        return this.appendString(string, StandardCharsets.UTF_8);
     }
 
 
@@ -281,11 +288,11 @@ public class FileResource extends Resource {
     }
 
     @Override
-    public InputStream inStream() {
-        try{
+    public InputStream inStream() throws ResourceAccessException {
+        try {
             return new FileInputStream(file);
-        }catch(FileNotFoundException e){
-            throw new RuntimeException(e);
+        } catch(FileNotFoundException e) {
+            throw new ResourceAccessException(e);
         }
     }
 

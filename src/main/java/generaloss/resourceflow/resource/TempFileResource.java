@@ -5,20 +5,11 @@ import java.io.IOException;
 
 public class TempFileResource extends FileResource {
 
-    private static File createTempFile(String prefix, String suffix, File directory) {
-        try{
-            return File.createTempFile(prefix, suffix, directory);
-        }catch(IOException e){
-            throw new RuntimeException(e);
-        }
+    protected TempFileResource(String prefix, String suffix, File directory) throws IOException {
+        super(File.createTempFile(prefix, suffix, directory));
     }
 
-
-    protected TempFileResource(String prefix, String suffix, File directory) {
-        super(createTempFile(prefix, suffix, directory));
-    }
-
-    protected TempFileResource(String prefix, String suffix) {
+    protected TempFileResource(String prefix, String suffix) throws IOException {
         this(prefix, suffix, null);
     }
 

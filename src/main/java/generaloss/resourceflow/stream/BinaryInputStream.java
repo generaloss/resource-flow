@@ -14,17 +14,20 @@ import java.util.UUID;
 
 public class BinaryInputStream extends DataInputStream {
     
-    public BinaryInputStream(InputStream in){
+    public BinaryInputStream(InputStream in) {
         super(in);
     }
 
-    public BinaryInputStream(byte[] bytes){
+    public BinaryInputStream(byte[] bytes) {
         super(new ByteArrayInputStream(bytes));
     }
 
 
     public String readByteString() throws IOException {
         final int length = super.readInt();
+        if(length < 0)
+            return null;
+
         final byte[] bytes = this.readBytes(length);
         return new String(bytes);
     }
@@ -114,52 +117,99 @@ public class BinaryInputStream extends DataInputStream {
 
 
     public byte[] readByteArray() throws IOException {
-        return this.readBytes(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readBytes(length);
     }
 
     public short[] readShortArray() throws IOException {
-        return this.readShorts(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readShorts(length);
     }
 
     public int[] readIntArray() throws IOException {
-        return this.readInts(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readInts(length);
     }
 
     public long[] readLongArray() throws IOException {
-        return this.readLongs(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readLongs(length);
     }
 
     public float[] readFloatArray() throws IOException {
-        return this.readFloats(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readFloats(length);
     }
 
     public double[] readDoubleArray() throws IOException {
-        return this.readDoubles(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readDoubles(length);
     }
 
     public boolean[] readBoolArray() throws IOException {
-        return this.readBools(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readBools(length);
     }
 
     public char[] readCharArray() throws IOException {
-        return this.readChars(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readChars(length);
     }
 
     public String[] readByteStringArray() throws IOException {
-        return this.readByteStrings(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readByteStrings(length);
     }
 
     public String[] readCharStringArray() throws IOException {
-        return this.readCharStrings(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readCharStrings(length);
     }
 
     public String[] readUTFStringArray() throws IOException {
-        return this.readUTFStrings(super.readInt());
+        final int length = super.readInt();
+        if(length < 0)
+            return null;
+
+        return this.readUTFStrings(length);
     }
 
 
     public ByteBuffer readDirectByteBuffer() throws IOException {
         final byte[] array = this.readByteArray();
+        if(array == null)
+            return null;
+
         final ByteBuffer buffer = ByteBuffer.allocateDirect(array.length);
         buffer.put(array);
         buffer.flip();
@@ -168,6 +218,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public ByteBuffer readByteBuffer() throws IOException {
         final byte[] array = this.readByteArray();
+        if(array == null)
+            return null;
+
         final ByteBuffer buffer = ByteBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -176,6 +229,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public ShortBuffer readShortBuffer() throws IOException {
         final short[] array = this.readShortArray();
+        if(array == null)
+            return null;
+
         final ShortBuffer buffer = ShortBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -184,6 +240,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public IntBuffer readIntBuffer() throws IOException {
         final int[] array = this.readIntArray();
+        if(array == null)
+            return null;
+
         final IntBuffer buffer = IntBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -192,6 +251,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public LongBuffer readLongBuffer() throws IOException {
         final long[] array = this.readLongArray();
+        if(array == null)
+            return null;
+
         final LongBuffer buffer = LongBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -200,6 +262,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public FloatBuffer readFloatBuffer() throws IOException {
         final float[] array = this.readFloatArray();
+        if(array == null)
+            return null;
+
         final FloatBuffer buffer = FloatBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -208,6 +273,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public DoubleBuffer readDoubleBuffer() throws IOException {
         final double[] array = this.readDoubleArray();
+        if(array == null)
+            return null;
+
         final DoubleBuffer buffer = DoubleBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -216,6 +284,9 @@ public class BinaryInputStream extends DataInputStream {
 
     public CharBuffer readCharBuffer() throws IOException {
         final char[] array = this.readCharArray();
+        if(array == null)
+            return null;
+
         final CharBuffer buffer = CharBuffer.allocate(array.length);
         buffer.put(array);
         buffer.flip();
@@ -224,92 +295,180 @@ public class BinaryInputStream extends DataInputStream {
 
 
     public BoolList readBoolList() throws IOException {
-        return new BoolList(this.readBoolArray());
+        final boolean[] array = this.readBoolArray();
+        if(array == null)
+            return null;
+
+        return new BoolList(array);
     }
 
     public ByteList readByteList() throws IOException {
-        return new ByteList(this.readByteArray());
+        final byte[] array = this.readByteArray();
+        if(array == null)
+            return null;
+
+        return new ByteList(array);
     }
 
     public CharList readCharList() throws IOException {
-        return new CharList(this.readCharArray());
+        final char[] array = this.readCharArray();
+        if(array == null)
+            return null;
+
+        return new CharList(array);
     }
 
     public DoubleList readDoubleList() throws IOException {
-        return new DoubleList(this.readDoubleArray());
+        final double[] array = this.readDoubleArray();
+        if(array == null)
+            return null;
+
+        return new DoubleList(array);
     }
 
     public FloatList readFloatList() throws IOException {
-        return new FloatList(this.readFloatArray());
+        final float[] array = this.readFloatArray();
+        if(array == null)
+            return null;
+
+        return new FloatList(array);
     }
 
     public IntList readIntList() throws IOException {
-        return new IntList(this.readIntArray());
+        final int[] array = this.readIntArray();
+        if(array == null)
+            return null;
+
+        return new IntList(array);
     }
 
     public LongList readLongList() throws IOException {
-        return new LongList(this.readLongArray());
+        final long[] array = this.readLongArray();
+        if(array == null)
+            return null;
+
+        return new LongList(array);
     }
 
     public ShortList readShortList() throws IOException {
-        return new ShortList(this.readShortArray());
+        final short[] array = this.readShortArray();
+        if(array == null)
+            return null;
+
+        return new ShortList(array);
     }
 
     public StringList readByteStringList() throws IOException {
-        return new StringList(this.readByteStringArray());
+        final String[] array = this.readByteStringArray();
+        if(array == null)
+            return null;
+
+        return new StringList(array);
     }
 
     public StringList readCharStringList() throws IOException {
-        return new StringList(this.readCharStringArray());
+        final String[] array = this.readCharStringArray();
+        if(array == null)
+            return null;
+
+        return new StringList(array);
     }
 
     public StringList readUTFStringList() throws IOException {
-        return new StringList(this.readUTFStringArray());
+        final String[] array = this.readUTFStringArray();
+        if(array == null)
+            return null;
+
+        return new StringList(array);
     }
 
 
-    public BoolList readBoolList(BoolList list) throws IOException {
-        return new BoolList(this.readBoolArray());
+    public BoolList readBoolList(BoolList dst) throws IOException {
+        final boolean[] array = this.readBoolArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
-    public ByteList readByteList(ByteList list) throws IOException {
-        return new ByteList(this.readByteArray());
+    public ByteList readByteList(ByteList dst) throws IOException {
+        final byte[] array = this.readByteArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public CharList readCharList(CharList dst) throws IOException {
-        return dst.clear().add(this.readCharArray());
+        final char[] array = this.readCharArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public DoubleList readDoubleList(DoubleList dst) throws IOException {
-        return dst.clear().add(this.readDoubleArray());
+        final double[] array = this.readDoubleArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public FloatList readFloatList(FloatList dst) throws IOException {
-        return dst.clear().add(this.readFloatArray());
+        final float[] array = this.readFloatArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public IntList readIntList(IntList dst) throws IOException {
-        return dst.clear().add(this.readIntArray());
+        final int[] array = this.readIntArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public LongList readLongList(LongList dst) throws IOException {
-        return dst.clear().add(this.readLongArray());
+        final long[] array = this.readLongArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public ShortList readShortList(ShortList dst) throws IOException {
-        return dst.clear().add(this.readShortArray());
+        final short[] array = this.readShortArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public StringList readByteStringList(StringList dst) throws IOException {
-        return dst.clear().add(this.readByteStringArray());
+        final String[] array = this.readByteStringArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public StringList readCharStringList(StringList dst) throws IOException {
-        return dst.clear().add(this.readCharStringArray());
+        final String[] array = this.readCharStringArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
     public StringList readUTFStringList(StringList dst) throws IOException {
-        return dst.clear().add(this.readUTFStringArray());
+        final String[] array = this.readUTFStringArray();
+        if(array == null)
+            return null;
+
+        return dst.clear().add(array);
     }
 
 

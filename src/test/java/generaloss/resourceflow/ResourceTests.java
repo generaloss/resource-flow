@@ -14,7 +14,7 @@ import java.util.zip.ZipFile;
 public class ResourceTests {
 
     @Test
-    public void fileTest() {
+    public void fileTest() throws IOException {
         // dir 0 -> 2
         final FileResource dir0 = Resource.file("testdir0");
         Assert.assertTrue(dir0.mkdir());
@@ -59,7 +59,7 @@ public class ResourceTests {
 
 
     @Test
-    public void fileTempFileTest1() {
+    public void fileTempFileTest1() throws IOException {
         final FileResource res = Resource.temp("jpize-temp-res-test-", ".txt");
         res.deleteOnExit();
         Assert.assertTrue(res.exists());

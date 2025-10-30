@@ -1,9 +1,9 @@
 package generaloss.resourceflow.resource;
 
-
 import generaloss.resourceflow.ResUtils;
 
 import java.io.InputStream;
+import java.net.URL;
 
 public class InternalResource extends Resource {
 
@@ -19,23 +19,23 @@ public class InternalResource extends Resource {
         this(InternalResource.class, path);
     }
 
-
     @Override
     public String path() {
         return path;
     }
 
     @Override
-    public InputStream inStream() {
+    public InputStream inStream() throws ResourceAccessException {
         final InputStream stream = classLoader.getResourceAsStream(path);
         if(stream == null)
-            throw new RuntimeException("Internal resource does not exists: " + path);
+            throw new ResourceAccessException("Internal resource does not exist: " + path);
         return stream;
     }
 
     @Override
     public boolean exists() {
-        return classLoader.getResource(path) != null;
+        final URL url = classLoader.getResource(path);
+        return (url != null);
     }
 
 }

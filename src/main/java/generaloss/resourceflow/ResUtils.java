@@ -9,9 +9,10 @@ public class ResUtils {
     public static void close(AutoCloseable closeable) {
         if(closeable == null)
             return;
-        try{
+
+        try {
             closeable.close();
-        }catch(Exception ignored){ }
+        } catch(Exception ignored) { }
     }
 
 }

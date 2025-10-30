@@ -21,6 +21,9 @@ public class FastReader implements Closeable {
     private int pointer, bytesRead;
 
     public FastReader(InputStream inputStream) {
+        if(inputStream == null)
+            throw new IllegalArgumentException("Argument 'inputStream' cannot be null");
+
         this.inputStream = inputStream;
         this.buffer = new byte[65536];
         this.charBuffer = new byte[256];

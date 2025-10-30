@@ -13,12 +13,8 @@ public class URLResource extends Resource {
         this.url = url;
     }
 
-    protected URLResource(String url) {
-        try{
-            this.url = new URL(url);
-        }catch(MalformedURLException e){
-            throw new RuntimeException(e);
-        }
+    protected URLResource(String url) throws MalformedURLException {
+        this.url = new URL(url);
     }
 
 
@@ -41,24 +37,24 @@ public class URLResource extends Resource {
     }
 
     @Override
-    public InputStream inStream() {
-        try{
-            final InputStream inStream = url.openStream();
-            if(inStream == null)
-                throw new RuntimeException("Remote resource does not exists: " + url);
+    public InputStream inStream() throws ResourceAccessException {
+        try {
+            final InputStream stream = url.openStream();
+            if(stream == null)
+                throw new ResourceAccessException("URL resource does not exist: " + url);
 
-            return inStream;
+            return stream;
         }catch(IOException e){
-            throw new RuntimeException(e);
+            throw new ResourceAccessException(e);
         }
     }
 
     @Override
     public boolean exists() {
-        try{
+        try {
             url.openStream().close();
             return true;
-        }catch(IOException ignored){
+        } catch(IOException ignored) {
             return false;
         }
     }

@@ -49,6 +49,7 @@ public class ZipResource extends Resource {
             final ZipEntry entry = entries.nextElement();
             if(entry.isDirectory() || entry == this.entry)
                 continue;
+
             if(entry.getName().startsWith(this.entry.getName()))
                 list.add(entry);
         }
@@ -78,7 +79,8 @@ public class ZipResource extends Resource {
 
 
     public String absolutePath() {
-        return ResUtils.osGeneralizePath(file.getName()) + "/" + this.path();
+        final String filepath = ResUtils.osGeneralizePath(file.getName());
+        return (filepath + "/" + this.path());
     }
 
 
@@ -87,6 +89,7 @@ public class ZipResource extends Resource {
         String name = entry.getName();
         if(this.isDir())
             name = name.substring(0, name.length() - 1);
+
         return name.substring(name.lastIndexOf('/') + 1);
     }
 
@@ -96,17 +99,17 @@ public class ZipResource extends Resource {
     }
 
     @Override
-    public InputStream inStream() {
-        try{
+    public InputStream inStream() throws ResourceAccessException {
+        try {
             return file.getInputStream(entry);
-        }catch(IOException e){
-            throw new RuntimeException("Unable to open zip file entry " + e.getMessage());
+        } catch(IOException e) {
+            throw new ResourceAccessException(e);
         }
     }
 
     @Override
     public boolean exists() {
-        return (file != null && entry != null);
+        return !(file == null || entry == null);
     }
 
 }
