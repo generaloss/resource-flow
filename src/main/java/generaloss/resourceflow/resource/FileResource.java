@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 
 public class FileResource extends Resource {
 
-    protected final File file;
+    private final File file;
 
     protected FileResource(File file) {
         this.file = file;
@@ -181,7 +181,7 @@ public class FileResource extends Resource {
         try {
             return new FileOutputStream(file);
         } catch(FileNotFoundException e) {
-            throw new ResourceAccessException(e);
+            throw new ResourceAccessException("Cannot open file: " + file.getName(), e);
         }
     }
 
@@ -292,7 +292,7 @@ public class FileResource extends Resource {
         try {
             return new FileInputStream(file);
         } catch(FileNotFoundException e) {
-            throw new ResourceAccessException(e);
+            throw new ResourceAccessException("Cannot open file: " + file.getName(), e);
         }
     }
 

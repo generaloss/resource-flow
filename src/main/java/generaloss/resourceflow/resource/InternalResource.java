@@ -7,8 +7,8 @@ import java.net.URL;
 
 public class InternalResource extends Resource {
 
-    protected final String path;
-    protected final Class<?> classLoader;
+    private final String path;
+    private final Class<?> classLoader;
 
     protected InternalResource(Class<?> classLoader, String path) {
         this.classLoader = classLoader;
@@ -22,6 +22,10 @@ public class InternalResource extends Resource {
     @Override
     public String path() {
         return path;
+    }
+
+    public Class<?> classLoader() {
+        return classLoader;
     }
 
     @Override

@@ -34,15 +34,17 @@ public abstract class Resource {
 
 
     public byte[] readBytes() {
-        try(InputStream inStream = this.inStream()){
+        try(InputStream inStream = this.inStream()) {
             return inStream.readAllBytes();
-        }catch(IOException e){
+        } catch(IOException e) {
             return null;
         }
     }
 
     public ByteBuffer readByteBuffer() {
         final byte[] bytes = this.readBytes();
+        if(bytes == null)
+            return null;
 
         final ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
         buffer.order(ByteOrder.nativeOrder());
@@ -54,6 +56,9 @@ public abstract class Resource {
 
     public String readString(Charset charset) {
         final byte[] bytes = this.readBytes();
+        if(bytes == null)
+            return null;
+
         return new String(bytes, charset);
     }
 
@@ -128,6 +133,10 @@ public abstract class Resource {
         return (this instanceof ZipResource);
     }
 
+    public boolean isJarRes() {
+        return (this instanceof ClasspathResource);
+    }
+
 
     public FileResource asFileRes() {
         return ((FileResource) this);
@@ -147,6 +156,10 @@ public abstract class Resource {
 
     public ZipResource asZipRes() {
         return ((ZipResource) this);
+    }
+
+    public ClasspathResource asJarRes() {
+        return ((ClasspathResource) this);
     }
 
 
@@ -251,12 +264,6 @@ public abstract class Resource {
     }
 
 
-    public static InternalResource internal(String path) {
-        if(path == null)
-            throw new IllegalArgumentException("Argument 'path' cannot be null");
-        return new InternalResource(path);
-    }
-
     public static InternalResource internal(Class<?> classLoader, String path) {
         if(classLoader == null)
             throw new IllegalArgumentException("Argument 'classLoader' cannot be null");
@@ -266,20 +273,11 @@ public abstract class Resource {
         return new InternalResource(classLoader, path);
     }
 
-    public static InternalResource[] internal(String... paths) {
-        if(paths == null)
-            throw new IllegalArgumentException("Argument 'paths' cannot be null");
-
-        final InternalResource[] arr = new InternalResource[paths.length];
-        for(int i = 0; i < arr.length; i++)
-            arr[i] = internal(paths[i]);
-
-        return arr;
+    public static InternalResource internal(String path) {
+        return internal(InternalResource.class, path);
     }
 
     public static InternalResource[] internal(Class<?> classLoader, String... paths) {
-        if(classLoader == null)
-            throw new IllegalArgumentException("Argument 'classLoader' cannot be null");
         if(paths == null)
             throw new IllegalArgumentException("Argument 'paths' cannot be null");
 
@@ -288,6 +286,10 @@ public abstract class Resource {
             arr[i] = internal(classLoader, paths[i]);
 
         return arr;
+    }
+
+    public static InternalResource[] internal(String... paths) {
+        return internal(InternalResource.class, paths);
     }
 
 
@@ -345,6 +347,43 @@ public abstract class Resource {
             arr[i] = zip(zipFile, entries.nextElement());
 
         return arr;
+    }
+
+
+    public static ClasspathResource classpath(ClassLoader classLoader, boolean disableCaching, String entryPath) {
+        if(classLoader == null)
+            throw new IllegalArgumentException("Argument 'classLoader' cannot be null");
+        if(entryPath == null)
+            throw new IllegalArgumentException("Argument 'path' cannot be null");
+
+        return new ClasspathResource(classLoader, disableCaching, entryPath);
+    }
+
+    public static ClasspathResource classpath(ClassLoader classLoader, String entryPath) {
+        return classpath(classLoader, false, entryPath);
+    }
+
+    public static ClasspathResource classpath(String entryPath) {
+        return classpath(ClasspathResource.class.getClassLoader(), entryPath);
+    }
+
+    public static ClasspathResource[] classpath(ClassLoader classLoader, boolean disableCaching, String... entriesPaths) {
+        if(entriesPaths == null)
+            throw new IllegalArgumentException("Argument 'entriesPaths' cannot be null");
+
+        final ClasspathResource[] arr = new ClasspathResource[entriesPaths.length];
+        for(int i = 0; i < arr.length; i++)
+            arr[i] = classpath(classLoader, disableCaching, entriesPaths[i]);
+
+        return arr;
+    }
+
+    public static ClasspathResource[] classpath(ClassLoader classLoader, String... entriesPaths) {
+        return classpath(classLoader, false, entriesPaths);
+    }
+
+    public static ClasspathResource[] classpath(String... entriesPaths) {
+        return classpath(ClasspathResource.class.getClassLoader(), entriesPaths);
     }
 
 }

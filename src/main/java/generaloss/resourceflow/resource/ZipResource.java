@@ -12,8 +12,8 @@ import java.util.zip.ZipFile;
 
 public class ZipResource extends Resource {
 
-    protected final ZipFile file;
-    protected final ZipEntry entry;
+    private final ZipFile file;
+    private final ZipEntry entry;
 
     protected ZipResource(ZipFile file, ZipEntry entry) {
         this.file = file;
@@ -40,7 +40,7 @@ public class ZipResource extends Resource {
 
     private ZipEntry[] listEntries() {
         if(this.isFile())
-            throw new IllegalStateException("File entry cannot be listed");
+            throw new IllegalStateException("ZIP entry file cannot be listed");
 
         final List<ZipEntry> list = new ArrayList<>();
         final Enumeration<? extends ZipEntry> entries = file.entries();
@@ -103,7 +103,7 @@ public class ZipResource extends Resource {
         try {
             return file.getInputStream(entry);
         } catch(IOException e) {
-            throw new ResourceAccessException(e);
+            throw new ResourceAccessException("Cannot open ZIP entry: " + entry.getName(), e);
         }
     }
 
