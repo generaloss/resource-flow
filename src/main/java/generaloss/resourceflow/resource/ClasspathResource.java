@@ -21,6 +21,7 @@ import java.util.zip.ZipFile;
 public class ClasspathResource extends Resource {
 
     private static final int FILE_PROTOCOL_LENGTH = "file:".length(); // = 5
+    private static final String CLASS_EXTENSION = ".class";
 
     private final ClassLoader classLoader;
     private String entryPath;
@@ -85,6 +86,7 @@ public class ClasspathResource extends Resource {
         if(nameFilter == null)
             throw new IllegalArgumentException("Argurment 'nameFilter' cannot be null");
 
+        this.initEntries();
         if(!isDirectory)
             return new String[0];
 
@@ -114,12 +116,15 @@ public class ClasspathResource extends Resource {
     }
 
     public Class<?>[] listClasses(ClassFilter filter) {
-        final String[] classNames = this.listSubentriesNames(name -> name.endsWith(".class"));
-        final Class<?>[] list = new Class[classNames.length];
+        final String[] classFilenames = this.listSubentriesNames(name -> name.endsWith(CLASS_EXTENSION));
+        final Class<?>[] list = new Class[classFilenames.length];
 
-        for(int i = 0; i < classNames.length; i++) {
+        for(int i = 0; i < classFilenames.length; i++) {
             try {
-                final String className = (entryPath + classNames[i]).replace('/', '.');
+                final String classFilename = classFilenames[i];
+                final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
+                final String simpleClassName = classFilename.substring(0, extensionStartIndex);
+                final String className = (entryPath + simpleClassName).replace('/', '.');
                 final Class<?> clazz = Class.forName(className);
                 list[i] = clazz;
             } catch(ClassNotFoundException ignored) { }

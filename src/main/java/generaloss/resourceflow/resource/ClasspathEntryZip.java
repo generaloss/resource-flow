@@ -45,7 +45,7 @@ class ClasspathEntryZip extends ClasspathEntry {
 
     @Override
     public String[] list(StringFilter filter) {
-        try(final ZipFile zipFile = new ZipFile(super.filePath)){
+        try(final ZipFile zipFile = new ZipFile(super.filePath)) {
 
             return zipFile.stream()
                 .filter(entry -> {

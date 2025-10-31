@@ -1,13 +1,12 @@
 package generaloss.resourceflow;
 
-import generaloss.resourceflow.resource.FileResource;
-import generaloss.resourceflow.resource.InternalResource;
-import generaloss.resourceflow.resource.Resource;
-import generaloss.resourceflow.resource.ZipResource;
+import generaloss.rawlist.StringList;
+import generaloss.resourceflow.resource.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipFile;
 
@@ -19,7 +18,7 @@ public class ResourceTests {
         final FileResource dir0 = Resource.file("testdir0");
         Assert.assertTrue(dir0.mkdir());
         Assert.assertTrue(dir0.exists());
-        Assert.assertTrue(dir0.isDir());
+        Assert.assertTrue(dir0.isDirectory());
         // file 0 -> 1
         final FileResource file0 = Resource.file("testfile0");
         Assert.assertTrue(file0.create());
@@ -49,7 +48,7 @@ public class ResourceTests {
         file2.delete();
         // dir 1
         final FileResource dir1 = movedfile1.parent().createChildDir("testdir1");
-        Assert.assertTrue(dir1.isDir());
+        Assert.assertTrue(dir1.isDirectory());
         Assert.assertTrue(dir1.exists());
         dir1.delete();
         final FileResource dir2 = dir0.move("testdir2", StandardCopyOption.REPLACE_EXISTING);
@@ -87,24 +86,45 @@ public class ResourceTests {
         Assert.assertArrayEquals(new String[] {"64", "16", "2"}, res.readLines());
     }
 
-
     @Test
-    public void urlTest1() {
-        // final URLResource res = Resource.url("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
-        // Assert.assertTrue(res.exists());
-        // Assert.assertEquals(-250076188, res.readString().hashCode());
+    public void urlTest1() throws MalformedURLException {
+        final URLResource res = Resource.url("https://repo1.maven.org/maven2/io/github/generaloss/resource-flow/25.8.1/resource-flow-25.8.1.pom");
+        Assert.assertTrue(res.exists());
+        Assert.assertEquals(84322616, res.readString().hashCode());
     }
-
 
     @Test
     public void zipTest1() throws IOException {
         final ZipFile file = new ZipFile("./src/test/resources/test.zip");
         final ZipResource[] resources = Resource.zip(file);
         Assert.assertEquals(4, resources.length);
-        Assert.assertTrue(resources[0].isDir());
+        Assert.assertTrue(resources[0].isDirectory());
         Assert.assertTrue(resources[1].isFile());
         Assert.assertEquals("blocks", resources[0].name());
         Assert.assertEquals("dirt.json", resources[1].name());
+    }
+
+    @Test
+    public void classpathTest1() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow/");
+        final ClasspathResource libPackageRes = Resource.classpath("generaloss/rawlist/");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(libPackageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(libPackageRes.isDirectory());
+        Assert.assertTrue(new StringList(packageRes.listSubentriesNames()).contains("ResUtils.class"));
+        Assert.assertTrue(new StringList(libPackageRes.listSubentriesNames()).contains("ArrayUtils.class"));
+
+        final ClasspathResource classRes = Resource.classpath("generaloss/resourceflow/ResUtils.class");
+        final ClasspathResource libClassRes = Resource.classpath("generaloss/rawlist/ArrayUtils.class");
+
+        Assert.assertTrue(classRes.exists());
+        Assert.assertTrue(libClassRes.exists());
+        Assert.assertFalse(classRes.isDirectory());
+        Assert.assertFalse(libClassRes.isDirectory());
+        classRes.readString();
+        libClassRes.readString();
     }
 
 }

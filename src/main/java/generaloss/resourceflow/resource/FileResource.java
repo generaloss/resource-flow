@@ -126,7 +126,7 @@ public class FileResource extends Resource {
     }
 
 
-    public boolean isDir() {
+    public boolean isDirectory() {
         return file.isDirectory();
     }
 

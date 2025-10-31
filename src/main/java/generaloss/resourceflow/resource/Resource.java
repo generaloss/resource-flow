@@ -239,13 +239,13 @@ public abstract class Resource {
         return arr;
     }
 
-    public static FileResource[] file(URI... uris) {
-        if(uris == null)
-            throw new IllegalArgumentException("Argument 'uris' cannot be null");
+    public static FileResource[] file(URI... urls) {
+        if(urls == null)
+            throw new IllegalArgumentException("Argument 'urls' cannot be null");
 
-        final FileResource[] arr = new FileResource[uris.length];
+        final FileResource[] arr = new FileResource[urls.length];
         for(int i = 0; i < arr.length; i++)
-            arr[i] = file(uris[i]);
+            arr[i] = file(urls[i]);
 
         return arr;
     }

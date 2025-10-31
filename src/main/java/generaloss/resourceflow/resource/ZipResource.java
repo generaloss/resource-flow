@@ -29,7 +29,7 @@ public class ZipResource extends Resource {
     }
 
 
-    public boolean isDir() {
+    public boolean isDirectory() {
         return entry.isDirectory();
     }
 
@@ -87,7 +87,7 @@ public class ZipResource extends Resource {
     @Override
     public String name() {
         String name = entry.getName();
-        if(this.isDir())
+        if(this.isDirectory())
             name = name.substring(0, name.length() - 1);
 
         return name.substring(name.lastIndexOf('/') + 1);
