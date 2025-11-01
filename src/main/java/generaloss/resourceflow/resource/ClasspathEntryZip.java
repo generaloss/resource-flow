@@ -5,13 +5,15 @@ import generaloss.resourceflow.stream.StringFilter;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 class ClasspathEntryZip extends ClasspathEntry {
 
-    public ClasspathEntryZip(String filepath, String entrypath, String name, boolean isDir) {
-        super(filepath, entrypath, name, isDir);
+    public ClasspathEntryZip(String filePath, String entryPath, String name, boolean isDirectory) {
+        super(filePath, entryPath, name, isDirectory);
     }
 
     @Override
@@ -48,10 +50,11 @@ class ClasspathEntryZip extends ClasspathEntry {
         try(final ZipFile zipFile = new ZipFile(super.filePath)) {
 
             return zipFile.stream()
-                .filter(entry -> {
-                    final String name = entry.getName();
+                .filter(zipEntry -> {
+                    final String name = zipEntry.getName();
                     return (name.startsWith(entryPath) && !name.equals(entryPath));
-                }).map(zipEntry -> {
+                })
+                .map(zipEntry -> {
                     final String relative = zipEntry.getName().substring(entryPath.length());
 
                     final int slashIndex = relative.indexOf('/');
@@ -66,6 +69,51 @@ class ClasspathEntryZip extends ClasspathEntry {
 
         } catch(IOException e) {
             return new String[0];
+        }
+    }
+
+    @Override
+    public ClasspathEntry[] listEntries(boolean directories, boolean files, StringFilter filter) {
+        try(final ZipFile zipFile = new ZipFile(super.filePath)) {
+
+            final Set<String> visitedNames = new HashSet<>();
+
+            zipFile.entries().asIterator().forEachRemaining(zipEntry -> {
+                if( != directories)
+                    return;
+
+                final String entryName = zipEntry.getName();
+                if(entryName.equals(entryPath) || !entryName.startsWith(entryPath))
+                    return;
+
+                final String relative = entryName.substring(entryPath.length());
+
+                final int slashIndex = relative.indexOf('/');
+                final String name = (slashIndex == -1) ? relative : relative.substring(0, slashIndex);
+
+                if(visitedNames.contains(name))
+                    return;
+                visitedNames.add(name);
+
+                if(!filter.test(name))
+                    return;
+
+                final ClasspathEntryZip entry = new ClasspathEntryZip(
+                    filePath,
+                    entryPath + entryName,
+                    entryName,
+                    zipEntry.isDirectory()
+                );
+            });
+
+            return zipFile.stream()
+                .map(entryName ->
+
+                )
+                .toArray(ClasspathEntryZip[]::new);
+
+        } catch(IOException e) {
+            return new ClasspathEntryZip[0];
         }
     }
 

@@ -113,8 +113,8 @@ public class ResourceTests {
         Assert.assertTrue(libPackageRes.exists());
         Assert.assertTrue(packageRes.isDirectory());
         Assert.assertTrue(libPackageRes.isDirectory());
-        Assert.assertTrue(new StringList(packageRes.listSubentriesNames()).contains("ResUtils.class"));
-        Assert.assertTrue(new StringList(libPackageRes.listSubentriesNames()).contains("ArrayUtils.class"));
+        Assert.assertTrue(new StringList(packageRes.listNames()).contains("ResUtils.class"));
+        Assert.assertTrue(new StringList(libPackageRes.listNames()).contains("ArrayUtils.class"));
 
         final ClasspathResource classRes = Resource.classpath("generaloss/resourceflow/ResUtils.class");
         final ClasspathResource libClassRes = Resource.classpath("generaloss/rawlist/ArrayUtils.class");

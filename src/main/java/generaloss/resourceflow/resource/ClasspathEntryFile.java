@@ -6,8 +6,8 @@ import java.io.*;
 
 class ClasspathEntryFile extends ClasspathEntry {
 
-    public ClasspathEntryFile(String filePath, String entryPath, String name, boolean isDir) {
-        super(filePath, entryPath, name, isDir);
+    public ClasspathEntryFile(String filePath, String entryPath, String name, boolean isDirectory) {
+        super(filePath, entryPath, name, isDirectory);
     }
 
     @Override
@@ -30,6 +30,11 @@ class ClasspathEntryFile extends ClasspathEntry {
         final File dirFile = new File(super.filePath);
         final FilenameFilter filenameFilter = (file, name) -> filter.test(name);
         return dirFile.list(filenameFilter);
+    }
+
+    @Override
+    public ClasspathEntry[] listEntries(boolean directories, boolean files, StringFilter filter) {
+        return new ClasspathEntry[0];
     }
 
 }

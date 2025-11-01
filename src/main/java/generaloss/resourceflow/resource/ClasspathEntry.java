@@ -24,4 +24,6 @@ abstract class ClasspathEntry {
 
     public abstract String[] list(StringFilter filter);
 
+    public abstract ClasspathEntry[] listEntries(boolean directories, boolean files, StringFilter filter);
+
 }
