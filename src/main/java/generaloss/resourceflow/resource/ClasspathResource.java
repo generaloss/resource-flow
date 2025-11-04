@@ -13,7 +13,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -82,6 +81,17 @@ public class ClasspathResource extends Resource {
         return new ClasspathResource(classLoader, entryPath + name);
     }
 
+    public Class<?> classByFilename(String classFilename) {
+        try {
+            final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
+            final String simpleClassName = classFilename.substring(0, extensionStartIndex);
+            final String className = (entryPath + simpleClassName).replace('/', '.');
+            return Class.forName(className);
+        } catch(ClassNotFoundException ignored) {
+            return null;
+        }
+    }
+
 
     public String[] listNames(StringFilter nameFilter) {
         if(nameFilter == null)
@@ -116,61 +126,45 @@ public class ClasspathResource extends Resource {
         return this.list(StringFilter.ANY);
     }
 
-
-    private ClasspathEntry[] listSubentries(StringFilter nameFilter) {
-        final List<ClasspathEntry> list = new ArrayList<>();
-        for(ClasspathEntry entry : entries) {
-            final String[] names = Arrays.stream(entry.list(nameFilter))
-                .map();
-
-            list.add();
-        }
-
-        return list.toArray(new ClasspathEntry[0]);
-    }
-
-    private ClasspathResource[] listSubentries() {
-        return this.listSubentries(StringFilter.ANY);
-    }
-
-
     public Class<?>[] listClasses(ClassFilter filter) {
         final String[] classFilenames = this.listNames(name -> name.endsWith(CLASS_EXTENSION));
         final Class<?>[] list = new Class[classFilenames.length];
 
         for(int i = 0; i < classFilenames.length; i++) {
-            try {
-                final String classFilename = classFilenames[i];
-                final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
-                final String simpleClassName = classFilename.substring(0, extensionStartIndex);
-                final String className = (entryPath + simpleClassName).replace('/', '.');
-                final Class<?> clazz = Class.forName(className);
-                list[i] = clazz;
-            } catch(ClassNotFoundException ignored) { }
+            final String classFilename = classFilenames[i];
+            final Class<?> clazz = this.classByFilename(classFilename);
+            list[i] = clazz;
         }
 
         return list;
     }
 
     public Class<?>[] listClassesRecursive(ClassFilter filter) {
-        final String[] entries = this.listNames();
+        this.initEntries();
+
         final List<Class<?>> list = new ArrayList<>(entries.length);
+        for(ClasspathEntry entry : entries)
+            collectClassesRecursive(entry, list, filter);
 
         return list.toArray(new Class[0]);
     }
 
-    private static void collectClassesRecursive(ClasspathEntry entry, List<Class<?>> output, ClassFilter filter) {
-        final String[] entries = this.listNames();
+    private static void collectClassesRecursive(ClasspathEntry prevEntry, List<Class<?>> output, ClassFilter filter) {
+        final ClasspathEntry[] entries = prevEntry.listEntries(StringFilter.ANY);
+        for(ClasspathEntry entry : entries) {
 
-        for(int i = 0; i < entries.length; i++) {
-            try {
-                final String classFilename = entries[i];
-                final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
-                final String simpleClassName = classFilename.substring(0, extensionStartIndex);
-                final String className = (entryPath + simpleClassName).replace('/', '.');
-                final Class<?> clazz = Class.forName(className);
-                output.add(clazz);
-            } catch(ClassNotFoundException ignored) { }
+            if(entry.isDirectory) {
+                collectClassesRecursive(entry, output, filter);
+            }else {
+                try {
+                    final String classFilename = entry.name;
+                    final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
+                    final String simpleClassName = classFilename.substring(0, extensionStartIndex);
+                    final String className = (prevEntry.entryPath + simpleClassName).replace('/', '.');
+                    final Class<?> clazz = Class.forName(className);
+                    output.add(clazz);
+                } catch(ClassNotFoundException ignored) { }
+            }
         }
     }
 

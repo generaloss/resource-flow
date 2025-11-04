@@ -5,7 +5,9 @@ import generaloss.resourceflow.stream.StringFilter;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -73,15 +75,13 @@ class ClasspathEntryZip extends ClasspathEntry {
     }
 
     @Override
-    public ClasspathEntry[] listEntries(boolean directories, boolean files, StringFilter filter) {
+    public ClasspathEntry[] listEntries(StringFilter filter) {
         try(final ZipFile zipFile = new ZipFile(super.filePath)) {
 
             final Set<String> visitedNames = new HashSet<>();
+            final List<ClasspathEntry> entries = new ArrayList<>();
 
             zipFile.entries().asIterator().forEachRemaining(zipEntry -> {
-                if( != directories)
-                    return;
-
                 final String entryName = zipEntry.getName();
                 if(entryName.equals(entryPath) || !entryName.startsWith(entryPath))
                     return;
@@ -98,20 +98,18 @@ class ClasspathEntryZip extends ClasspathEntry {
                 if(!filter.test(name))
                     return;
 
+                final boolean isDirectory = zipEntry.isDirectory();
+
                 final ClasspathEntryZip entry = new ClasspathEntryZip(
                     filePath,
-                    entryPath + entryName,
-                    entryName,
-                    zipEntry.isDirectory()
+                    (entryPath + name + (isDirectory ? "/" : "")),
+                    name,
+                    isDirectory
                 );
+                entries.add(entry);
             });
 
-            return zipFile.stream()
-                .map(entryName ->
-
-                )
-                .toArray(ClasspathEntryZip[]::new);
-
+            return entries.toArray(ClasspathEntry[]::new);
         } catch(IOException e) {
             return new ClasspathEntryZip[0];
         }
