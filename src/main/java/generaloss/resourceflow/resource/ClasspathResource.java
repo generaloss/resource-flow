@@ -84,6 +84,7 @@ public class ClasspathResource extends Resource {
 
 
     public String[] listNames(StringFilter nameFilter) {
+        this.initEntries();
         final StringList list = new StringList();
 
         entriesHolder.forEach(entry ->
@@ -112,11 +113,11 @@ public class ClasspathResource extends Resource {
     }
 
 
-    private static Class<?> classByFilename(String entryPath, String classFilename) {
+    private static Class<?> classByFilename(String classPath) {
         try {
-            final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
-            final String simpleClassName = classFilename.substring(0, extensionStartIndex);
-            final String className = (entryPath + simpleClassName).replace('/', '.');
+            final int extensionStartIndex = (classPath.length() - CLASS_EXTENSION.length());
+            final String classPathWithoutExtension = classPath.substring(0, extensionStartIndex);
+            final String className = classPathWithoutExtension.replace('/', '.');
             return Class.forName(className);
         } catch(ClassNotFoundException ignored) {
             return null;
@@ -128,8 +129,9 @@ public class ClasspathResource extends Resource {
         final List<Class<?>> list = new ArrayList<>(classFilenames.length);
 
         for(String classFilename : classFilenames) {
-            final Class<?> clazz = classByFilename(entryPath, classFilename);
-            if(clazz != null && filter.test(clazz)) list.add(clazz);
+            final Class<?> clazz = classByFilename(entryPath + classFilename);
+            if(clazz != null && filter.test(clazz))
+                list.add(clazz);
         }
 
         return list.toArray(new Class[0]);
@@ -153,8 +155,7 @@ public class ClasspathResource extends Resource {
             if(entry.isDirectory) {
                 collectClassesRecursive(entry, output, filter);
             }else {
-                final Class<?> clazz = classByFilename(entry.entryPath, entry.name);
-                System.out.println(entry.entryPath + "  ||  " + entry.name);
+                final Class<?> clazz = classByFilename(entry.entryPath);
                 if(clazz != null && filter.test(clazz))
                     output.add(clazz);
             }

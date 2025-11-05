@@ -5,10 +5,6 @@ import generaloss.resourceflow.stream.StringFilter;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -49,42 +45,39 @@ class ClasspathZipEntry extends ClasspathEntry {
 
     @Override
     public ClasspathEntry[] listEntries(StringFilter filter) {
-        try(final ZipFile zipFile = new ZipFile(super.filePath)) {
+        try (final ZipFile zipFile = new ZipFile(super.filePath)) {
+            final String zipEntryPath = addEndSlash(super.entryPath);
 
-            final Set<String> visitedNames = new HashSet<>();
-            final List<ClasspathEntry> entries = new ArrayList<>();
+            return zipFile.stream()
+                .filter(zipEntry -> {
+                    final String name = zipEntry.getName();
+                    return name.startsWith(zipEntryPath) && !name.equals(zipEntryPath);
+                })
+                .map(zipEntry -> {
+                    final String relative = zipEntry.getName().substring(zipEntryPath.length());
+                    final int slashIndex = relative.indexOf('/');
+                    return (slashIndex == -1) ? relative : relative.substring(0, slashIndex);
+                })
+                .filter(name -> !name.isEmpty())
+                .distinct()
+                .filter(filter)
+                .map(name -> {
+                    final String childEntryPath = zipEntryPath + name;
+                    final boolean isDirectory = zipFile.stream().anyMatch(e ->
+                        e.getName().startsWith(childEntryPath + "/")
+                    );
+                    final String entryPathPostfix = (isDirectory ? "/" : "");
 
-            zipFile.entries().asIterator().forEachRemaining(zipEntry -> {
-                final String entryName = zipEntry.getName();
-                if(entryName.equals(super.entryPath) || !entryName.startsWith(super.entryPath))
-                    return;
+                    return new ClasspathZipEntry(
+                        super.filePath,
+                        (zipEntryPath + name + entryPathPostfix),
+                        name,
+                        isDirectory
+                    );
+                })
+                .toArray(ClasspathEntry[]::new);
 
-                final String relative = entryName.substring(super.entryPath.length());
-
-                final int slashIndex = relative.indexOf('/');
-                final String name = (slashIndex == -1) ? relative : relative.substring(0, slashIndex);
-
-                if(visitedNames.contains(name))
-                    return;
-                visitedNames.add(name);
-
-                if(!filter.test(name))
-                    return;
-
-                final boolean isDirectory = zipEntry.isDirectory();
-                final String entryPathPostfix = (isDirectory ? "/" : "");
-
-                final ClasspathZipEntry entry = new ClasspathZipEntry(
-                    super.filePath,
-                    (super.entryPath + name + entryPathPostfix),
-                    name,
-                    isDirectory
-                );
-                entries.add(entry);
-            });
-
-            return entries.toArray(ClasspathEntry[]::new);
-        } catch(IOException e) {
+        } catch (IOException e) {
             return new ClasspathZipEntry[0];
         }
     }
@@ -93,13 +86,15 @@ class ClasspathZipEntry extends ClasspathEntry {
     public String[] listEntryNames(StringFilter filter) {
         try(final ZipFile zipFile = new ZipFile(super.filePath)) {
 
+            final String zipEntryPath = addEndSlash(super.entryPath);
+
             return zipFile.stream()
-                .filter(zipEntry -> {
-                    final String name = zipEntry.getName();
-                    return (name.startsWith(super.entryPath) && !name.equals(super.entryPath));
-                })
-                .map(zipEntry -> {
-                    final String relative = zipEntry.getName().substring(super.entryPath.length());
+                .map(ZipEntry::getName)
+                .filter(name ->
+                    name.startsWith(zipEntryPath) && !name.equals(zipEntryPath)
+                )
+                .map(name -> {
+                    final String relative = name.substring(zipEntryPath.length());
 
                     final int slashIndex = relative.indexOf('/');
                     if(slashIndex == -1)
@@ -108,12 +103,22 @@ class ClasspathZipEntry extends ClasspathEntry {
                     return relative.substring(0, slashIndex);
                 })
                 .distinct()
-                .filter(filter)
+                .filter(name ->
+                    !name.isEmpty() && filter.test(name)
+                )
                 .toArray(String[]::new);
 
         } catch(IOException e) {
             return new String[0];
         }
+    }
+
+    private static String addEndSlash(String path) {
+        if(path.isEmpty())
+            return "";
+        if(path.endsWith("/"))
+            return path;
+        return (path + "/");
     }
 
 }

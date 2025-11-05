@@ -13,6 +13,8 @@ public interface ClassFilter extends Predicate<Class<?>> {
     ClassFilter NON_ENUM = (c -> !c.isEnum());
     ClassFilter ANNOTATION = (Class::isAnnotation);
     ClassFilter NON_ANNOTATION = (c -> !c.isAnnotation());
+    ClassFilter ANONYMOUS = (Class::isAnonymousClass);
+    ClassFilter NON_ANONYMOUS = (c -> !c.isAnonymousClass());
 
     ClassFilter ABSTRACT = (c -> Modifier.isAbstract(c.getModifiers()));
     ClassFilter NON_ABSTRACT = (c -> !Modifier.isAbstract(c.getModifiers()));
