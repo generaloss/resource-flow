@@ -5,30 +5,19 @@ import generaloss.resourceflow.ResUtils;
 import generaloss.resourceflow.stream.ClassFilter;
 import generaloss.resourceflow.stream.StringFilter;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class ClasspathResource extends Resource {
 
-    private static final int FILE_PROTOCOL_LENGTH = "file:".length(); // = 5
     private static final String CLASS_EXTENSION = ".class";
 
     private final ClassLoader classLoader;
     private String entryPath;
     private final boolean disableCaching;
 
-    private ClasspathEntry[] entries;
-    private boolean isDirectory;
+    private ClasspathEntryHolder entriesHolder;
 
     protected ClasspathResource(ClassLoader classLoader, boolean disableCaching, String entryPath) throws ResourceAccessException {
         this.classLoader = classLoader;
@@ -53,27 +42,39 @@ public class ClasspathResource extends Resource {
         return entryPath;
     }
 
+
+    private void initEntries() throws ResourceAccessException {
+        if(!disableCaching && entriesHolder != null)
+            return;
+
+        entriesHolder = new ClasspathEntryHolder(classLoader, entryPath);
+
+        if(entriesHolder.isDirectory() && !entryPath.endsWith("/"))
+            entryPath += "/";
+    }
+
     @Override
     public InputStream inStream() throws ResourceAccessException {
         this.initEntries();
 
-        if(entries.length == 0)
+        if(entriesHolder.isEmpty())
             throw new ResourceAccessException("JAR resource does not exist: " + entryPath);
-        if(isDirectory)
+        if(entriesHolder.isDirectory())
             throw new ResourceAccessException("Cannot create InputStream for directory: " + entryPath);
 
-        return entries[0].openInputStream();
+        final ClasspathEntry entry = entriesHolder.getEntries()[0];
+        return entry.openInputStream();
     }
 
     @Override
     public boolean exists() {
         this.initEntries();
-        return (entries.length != 0);
+        return !entriesHolder.isEmpty();
     }
 
     public boolean isDirectory() {
         this.initEntries();
-        return isDirectory;
+        return entriesHolder.isDirectory();
     }
 
 
@@ -81,29 +82,12 @@ public class ClasspathResource extends Resource {
         return new ClasspathResource(classLoader, entryPath + name);
     }
 
-    public Class<?> classByFilename(String classFilename) {
-        try {
-            final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
-            final String simpleClassName = classFilename.substring(0, extensionStartIndex);
-            final String className = (entryPath + simpleClassName).replace('/', '.');
-            return Class.forName(className);
-        } catch(ClassNotFoundException ignored) {
-            return null;
-        }
-    }
-
 
     public String[] listNames(StringFilter nameFilter) {
-        if(nameFilter == null)
-            throw new IllegalArgumentException("Argurment 'nameFilter' cannot be null");
-
-        this.initEntries();
-        if(!isDirectory)
-            return new String[0];
-
         final StringList list = new StringList();
-        for(ClasspathEntry entry : entries)
-            list.add(entry.list(nameFilter));
+
+        entriesHolder.forEach(entry ->
+            list.add(entry.listEntryNames(nameFilter)));
 
         return list.trim().array();
     }
@@ -111,6 +95,7 @@ public class ClasspathResource extends Resource {
     public String[] listNames() {
         return this.listNames(StringFilter.ANY);
     }
+
 
     public ClasspathResource[] list(StringFilter nameFilter) {
         final String[] names = this.listNames(nameFilter);
@@ -126,24 +111,36 @@ public class ClasspathResource extends Resource {
         return this.list(StringFilter.ANY);
     }
 
+
+    private static Class<?> classByFilename(String entryPath, String classFilename) {
+        try {
+            final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
+            final String simpleClassName = classFilename.substring(0, extensionStartIndex);
+            final String className = (entryPath + simpleClassName).replace('/', '.');
+            return Class.forName(className);
+        } catch(ClassNotFoundException ignored) {
+            return null;
+        }
+    }
+
     public Class<?>[] listClasses(ClassFilter filter) {
         final String[] classFilenames = this.listNames(name -> name.endsWith(CLASS_EXTENSION));
-        final Class<?>[] list = new Class[classFilenames.length];
+        final List<Class<?>> list = new ArrayList<>(classFilenames.length);
 
-        for(int i = 0; i < classFilenames.length; i++) {
-            final String classFilename = classFilenames[i];
-            final Class<?> clazz = this.classByFilename(classFilename);
-            list[i] = clazz;
+        for(String classFilename : classFilenames) {
+            final Class<?> clazz = classByFilename(entryPath, classFilename);
+            if(clazz != null && filter.test(clazz)) list.add(clazz);
         }
 
-        return list;
+        return list.toArray(new Class[0]);
     }
+
 
     public Class<?>[] listClassesRecursive(ClassFilter filter) {
         this.initEntries();
 
-        final List<Class<?>> list = new ArrayList<>(entries.length);
-        for(ClasspathEntry entry : entries)
+        final List<Class<?>> list = new ArrayList<>(entriesHolder.size());
+        for(ClasspathEntry entry : entriesHolder.getEntries())
             collectClassesRecursive(entry, list, filter);
 
         return list.toArray(new Class[0]);
@@ -156,81 +153,12 @@ public class ClasspathResource extends Resource {
             if(entry.isDirectory) {
                 collectClassesRecursive(entry, output, filter);
             }else {
-                try {
-                    final String classFilename = entry.name;
-                    final int extensionStartIndex = (classFilename.length() - CLASS_EXTENSION.length());
-                    final String simpleClassName = classFilename.substring(0, extensionStartIndex);
-                    final String className = (prevEntry.entryPath + simpleClassName).replace('/', '.');
-                    final Class<?> clazz = Class.forName(className);
+                final Class<?> clazz = classByFilename(entry.entryPath, entry.name);
+                System.out.println(entry.entryPath + "  ||  " + entry.name);
+                if(clazz != null && filter.test(clazz))
                     output.add(clazz);
-                } catch(ClassNotFoundException ignored) { }
             }
         }
-    }
-
-
-    private void initEntries() throws ResourceAccessException {
-        if(disableCaching || entries != null)
-            return;
-
-        try {
-            final Enumeration<URL> urls = classLoader.getResources(entryPath);
-            final List<ClasspathEntry> entries = new ArrayList<>();
-
-            while(urls.hasMoreElements()) {
-                final URL url = urls.nextElement();
-                final String protocol = url.getProtocol();
-
-                if(protocol.equals("file")) {
-                    try {
-                        final File file = new File(url.toURI());
-
-                        if(file.isDirectory())
-                            this.enterDirectoryMode();
-
-                        entries.add(new ClasspathEntryFile(
-                            file.getAbsolutePath(),
-                            entryPath,
-                            file.getName(),
-                            file.isDirectory()
-                        ));
-                    } catch(URISyntaxException ignored) { }
-
-                }else if(protocol.equals("jar")) {
-                    final String urlPath = url.getPath();
-                    final int exclamationIndex = urlPath.indexOf("!");
-                    final String jarPath = urlPath.substring(FILE_PROTOCOL_LENGTH, exclamationIndex);
-                    final String decodedJarPath = URLDecoder.decode(jarPath, StandardCharsets.UTF_8);
-
-                    try(final ZipFile zipFile = new ZipFile(decodedJarPath)) {
-
-                        final ZipEntry zipEntry = zipFile.getEntry(entryPath);
-                        if(zipEntry == null)
-                            continue;
-
-                        if(zipEntry.isDirectory())
-                            this.enterDirectoryMode();
-
-                        entries.add(new ClasspathEntryZip(
-                            decodedJarPath,
-                            entryPath,
-                            zipEntry.getName(),
-                            zipEntry.isDirectory()
-                        ));
-                    } catch(IOException ignored) { }
-                }
-            }
-
-            this.entries = entries.toArray(new ClasspathEntry[0]);
-        } catch(IOException e) {
-            throw new ResourceAccessException(e);
-        }
-    }
-
-    private void enterDirectoryMode() {
-        isDirectory = true;
-        if(!entryPath.endsWith("/"))
-            entryPath += "/";
     }
 
 }

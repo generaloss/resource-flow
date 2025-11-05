@@ -22,8 +22,8 @@ abstract class ClasspathEntry {
 
     public abstract InputStream openInputStream();
 
-    public abstract String[] list(StringFilter filter);
-
     public abstract ClasspathEntry[] listEntries(StringFilter filter);
+
+    public abstract String[] listEntryNames(StringFilter filter);
 
 }
