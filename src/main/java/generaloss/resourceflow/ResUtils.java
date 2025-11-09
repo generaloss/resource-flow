@@ -19,7 +19,7 @@ public class ResUtils {
             return;
         try {
             closeable.close();
-        } catch(Exception ignored) { }
+        } catch (Exception ignored) { }
     }
 
 }

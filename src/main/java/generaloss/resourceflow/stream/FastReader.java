@@ -53,7 +53,7 @@ public class FastReader implements Closeable {
         try {
             pointer = 0;
             bytesRead = inputStream.read(buffer);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -145,7 +145,7 @@ public class FastReader implements Closeable {
     public String nextString(Charset charset) {
         try {
             return new String(inputStream.readAllBytes(), charset);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -5,7 +5,7 @@
 
     <groupId>io.github.generaloss</groupId>
     <artifactId>resource-flow</artifactId>
-    <version>25.10.1-SNAPSHOT-1</version>
+    <version>25.11.1-SNAPSHOT-1</version>
     <name>${artifactId}</name>
 
     <description>Resources Library</description>

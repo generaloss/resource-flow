@@ -41,13 +41,8 @@ class ClasspathEntryHolder {
                             if(file.isDirectory())
                                 isDirectory = true;
 
-                            entries.add(new ClasspathFileEntry(
-                                file.getAbsolutePath(),
-                                entryPath,
-                                file.getName(),
-                                file.isDirectory()
-                            ));
-                        } catch(URISyntaxException ignored) { }
+                            entries.add(new ClasspathFileEntry(file, entryPath));
+                        } catch (URISyntaxException ignored) { }
 
                     }else if(protocol.equals("jar")) {
                         final String urlPath = url.getPath();
@@ -70,11 +65,11 @@ class ClasspathEntryHolder {
                                 zipEntry.getName(),
                                 zipEntry.isDirectory()
                             ));
-                        } catch(IOException ignored) { }
+                        } catch (IOException ignored) { }
                     }
                 }
             return entries.toArray(new ClasspathEntry[0]);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ResourceAccessException(e);
         }
     }

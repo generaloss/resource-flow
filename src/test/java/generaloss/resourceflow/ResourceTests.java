@@ -1,13 +1,16 @@
 package generaloss.resourceflow;
 
+import generaloss.rawlist.ArrayUtils;
 import generaloss.rawlist.StringList;
 import generaloss.resourceflow.resource.*;
+import generaloss.spatialmath.matrix.Matrix3f;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.zip.ZipFile;
 
 public class ResourceTests {
@@ -105,7 +108,7 @@ public class ResourceTests {
     }
 
     @Test
-    public void classpathTest1() {
+    public void classpathTestListPackage() {
         final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow/");
         final ClasspathResource libPackageRes = Resource.classpath("generaloss/rawlist/");
 
@@ -115,7 +118,85 @@ public class ResourceTests {
         Assert.assertTrue(libPackageRes.isDirectory());
         Assert.assertTrue(new StringList(packageRes.listNames()).contains("ResUtils.class"));
         Assert.assertTrue(new StringList(libPackageRes.listNames()).contains("ArrayUtils.class"));
+    }
 
+    @Test
+    public void classpathTestListPackage2() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow");
+        final ClasspathResource libPackageRes = Resource.classpath("generaloss/rawlist");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(libPackageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(libPackageRes.isDirectory());
+        Assert.assertTrue(new StringList(packageRes.listNames()).contains("ResUtils.class"));
+        Assert.assertTrue(new StringList(libPackageRes.listNames()).contains("ArrayUtils.class"));
+    }
+
+    @Test
+    public void classpathTestListClasses1() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow/");
+        final ClasspathResource libPackageRes = Resource.classpath("generaloss/rawlist/");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(libPackageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(libPackageRes.isDirectory());
+        Assert.assertTrue(List.of(packageRes.listClasses()).contains(ResUtils.class));
+        Assert.assertTrue(List.of(libPackageRes.listClasses()).contains(ArrayUtils.class));
+    }
+
+    @Test
+    public void classpathTestListClasses2() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow");
+        final ClasspathResource libPackageRes = Resource.classpath("generaloss/rawlist");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(libPackageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(libPackageRes.isDirectory());
+        Assert.assertTrue(List.of(packageRes.listClasses()).contains(ResUtils.class));
+        Assert.assertTrue(List.of(libPackageRes.listClasses()).contains(ArrayUtils.class));
+    }
+
+    @Test
+    public void classpathTestListClassesRecursive1() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow/");
+        final ClasspathResource libPackageRes = Resource.classpath("generaloss/spatialmath/");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(libPackageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(libPackageRes.isDirectory());
+        Assert.assertTrue(List.of(packageRes.listClassesRecursive()).contains(FileResource.class));
+        Assert.assertTrue(List.of(libPackageRes.listClassesRecursive()).contains(Matrix3f.class));
+    }
+
+    @Test
+    public void classpathTestListClassesRecursive2() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss/resourceflow");
+        final ClasspathResource libPackageRes = Resource.classpath("generaloss/spatialmath");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(libPackageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(libPackageRes.isDirectory());
+        Assert.assertTrue(List.of(packageRes.listClassesRecursive()).contains(FileResource.class));
+        Assert.assertTrue(List.of(libPackageRes.listClassesRecursive()).contains(Matrix3f.class));
+    }
+
+    @Test
+    public void classpathTestListClassesRecursive3() {
+        final ClasspathResource packageRes = Resource.classpath("generaloss");
+
+        Assert.assertTrue(packageRes.exists());
+        Assert.assertTrue(packageRes.isDirectory());
+        Assert.assertTrue(List.of(packageRes.listClassesRecursive()).contains(FileResource.class));
+        Assert.assertTrue(List.of(packageRes.listClassesRecursive()).contains(Matrix3f.class));
+    }
+
+    @Test
+    public void classpathTestReadFile() {
         final ClasspathResource classRes = Resource.classpath("generaloss/resourceflow/ResUtils.class");
         final ClasspathResource libClassRes = Resource.classpath("generaloss/rawlist/ArrayUtils.class");
 

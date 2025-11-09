@@ -48,7 +48,7 @@ public class FileResource extends Resource {
     public boolean create() {
         try {
             return file.createNewFile();
-        } catch(IOException ignored) {
+        } catch (IOException ignored) {
             return false;
         }
     }
@@ -180,7 +180,7 @@ public class FileResource extends Resource {
     public FileOutputStream outStream() throws ResourceAccessException {
         try {
             return new FileOutputStream(file);
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new ResourceAccessException("Cannot open file: " + file.getName(), e);
         }
     }
@@ -209,7 +209,7 @@ public class FileResource extends Resource {
             out.flush();
 
             return true;
-        } catch(IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }
@@ -230,6 +230,18 @@ public class FileResource extends Resource {
         return this.appendString(string, StandardCharsets.UTF_8);
     }
 
+
+    public File[] listFiles() {
+        return file.listFiles();
+    }
+
+    public File[] listFiles(FilenameFilter filter) {
+        return file.listFiles(filter);
+    }
+
+    public File[] listFiles(FileFilter filter) {
+        return file.listFiles(filter);
+    }
 
     public String[] list() {
         final String[] list = file.list();
@@ -291,7 +303,7 @@ public class FileResource extends Resource {
     public InputStream inStream() throws ResourceAccessException {
         try {
             return new FileInputStream(file);
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new ResourceAccessException("Cannot open file: " + file.getName(), e);
         }
     }

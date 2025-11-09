@@ -119,7 +119,7 @@ public class ClasspathResource extends Resource {
             final String classPathWithoutExtension = classPath.substring(0, extensionStartIndex);
             final String className = classPathWithoutExtension.replace('/', '.');
             return Class.forName(className);
-        } catch(ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException ignored) {
             return null;
         }
     }
@@ -137,6 +137,10 @@ public class ClasspathResource extends Resource {
         return list.toArray(new Class[0]);
     }
 
+    public Class<?>[] listClasses() {
+        return this.listClasses(ClassFilter.ANY);
+    }
+
 
     public Class<?>[] listClassesRecursive(ClassFilter filter) {
         this.initEntries();
@@ -148,6 +152,10 @@ public class ClasspathResource extends Resource {
         return list.toArray(new Class[0]);
     }
 
+    public Class<?>[] listClassesRecursive() {
+        return this.listClassesRecursive(ClassFilter.ANY);
+    }
+
     private static void collectClassesRecursive(ClasspathEntry prevEntry, List<Class<?>> output, ClassFilter filter) {
         final ClasspathEntry[] entries = prevEntry.listEntries(StringFilter.ANY);
         for(ClasspathEntry entry : entries) {
@@ -155,7 +163,7 @@ public class ClasspathResource extends Resource {
             if(entry.isDirectory) {
                 collectClassesRecursive(entry, output, filter);
             }else {
-                final Class<?> clazz = classByFilename(entry.entryPath);
+                final Class<?> clazz = classByFilename(entry.internalEntryPath);
                 if(clazz != null && filter.test(clazz))
                     output.add(clazz);
             }

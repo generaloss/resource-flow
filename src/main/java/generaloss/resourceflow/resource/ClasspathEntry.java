@@ -6,14 +6,14 @@ import java.io.InputStream;
 
 abstract class ClasspathEntry {
 
-    protected final String filePath;
-    protected final String entryPath;
+    protected final String absoluteFilePath;
+    protected final String internalEntryPath;
     protected final String name;
     protected final boolean isDirectory;
 
-    public ClasspathEntry(String filePath, String entryPath, String name, boolean isDirectory) {
-        this.filePath = filePath;
-        this.entryPath = entryPath;
+    public ClasspathEntry(String absoluteFilePath, String internalEntryPath, String name, boolean isDirectory) {
+        this.absoluteFilePath = absoluteFilePath;
+        this.internalEntryPath = internalEntryPath;
         this.name = name;
         this.isDirectory = isDirectory;
     }
@@ -25,5 +25,14 @@ abstract class ClasspathEntry {
     public abstract ClasspathEntry[] listEntries(StringFilter filter);
 
     public abstract String[] listEntryNames(StringFilter filter);
+
+
+    public static String addEndSlash(String path) {
+        if(path.isEmpty())
+            return "";
+        if(path.endsWith("/"))
+            return path;
+        return (path + "/");
+    }
 
 }

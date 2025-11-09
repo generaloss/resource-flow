@@ -44,7 +44,7 @@ public class URLResource extends Resource {
                 throw new ResourceAccessException("Cannot open URL resource: " + url);
 
             return stream;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ResourceAccessException(e);
         }
     }
@@ -54,7 +54,7 @@ public class URLResource extends Resource {
         try {
             url.openStream().close();
             return true;
-        } catch(IOException ignored) {
+        } catch (IOException ignored) {
             return false;
         }
     }

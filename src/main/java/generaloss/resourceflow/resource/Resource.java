@@ -36,7 +36,7 @@ public abstract class Resource {
     public byte[] readBytes() {
         try(InputStream inStream = this.inStream()) {
             return inStream.readAllBytes();
-        } catch(IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }
