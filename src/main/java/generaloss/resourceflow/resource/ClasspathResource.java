@@ -26,7 +26,7 @@ public class ClasspathResource extends Resource {
     }
 
     protected ClasspathResource(ClassLoader classLoader, String entryPath) throws ResourceAccessException {
-        this(ClasspathResource.class.getClassLoader(), false, entryPath);
+        this(classLoader, false, entryPath);
     }
 
     protected ClasspathResource(String entryPath) throws ResourceAccessException {
@@ -79,6 +79,8 @@ public class ClasspathResource extends Resource {
 
 
     public ClasspathResource child(String name) {
+        if(!this.isDirectory())
+            throw new ResourceAccessException("Cannot get child of non-directory resource: " + entryPath);
         return new ClasspathResource(classLoader, entryPath + name);
     }
 
