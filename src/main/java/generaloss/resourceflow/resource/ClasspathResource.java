@@ -126,7 +126,8 @@ public class ClasspathResource extends Resource {
         }
     }
 
-    public Class<?>[] listClasses(ClassFilter filter) {
+    @SuppressWarnings("unchecked")
+    public <T> Class<T>[] listClasses(ClassFilter filter) {
         final String[] classFilenames = this.listNames(name -> name.endsWith(CLASS_EXTENSION));
         final List<Class<?>> list = new ArrayList<>(classFilenames.length);
 
@@ -139,12 +140,13 @@ public class ClasspathResource extends Resource {
         return list.toArray(new Class[0]);
     }
 
-    public Class<?>[] listClasses() {
+    public <T> Class<T>[] listClasses() {
         return this.listClasses(ClassFilter.ANY);
     }
 
 
-    public Class<?>[] listClassesRecursive(ClassFilter filter) {
+    @SuppressWarnings("unchecked")
+    public <T> Class<T>[] listClassesRecursive(ClassFilter filter) {
         this.initEntries();
 
         final List<Class<?>> list = new ArrayList<>(entriesHolder.size());
@@ -154,7 +156,7 @@ public class ClasspathResource extends Resource {
         return list.toArray(new Class[0]);
     }
 
-    public Class<?>[] listClassesRecursive() {
+    public <T> Class<T>[] listClassesRecursive() {
         return this.listClassesRecursive(ClassFilter.ANY);
     }
 
