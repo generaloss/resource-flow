@@ -5,10 +5,10 @@
 
     <groupId>io.github.generaloss</groupId>
     <artifactId>resource-flow</artifactId>
-    <version>25.11.1</version>
+    <version>25.11.2</version>
     <name>${artifactId}</name>
 
-    <description>Resources Library</description>
+    <description>Unified resource access library. Provides consistent APIs for files, classpath resources, URLs, and ZIP entries with streaming utilities.</description>
     <url>https://github.com/generaloss/${artifactId}</url>
 
     <dependencies>

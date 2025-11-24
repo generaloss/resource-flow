@@ -1,6 +1,5 @@
 package generaloss.resourceflow.resource;
 
-import generaloss.rawlist.StringList;
 import generaloss.resourceflow.stream.BinaryInputStream;
 import generaloss.resourceflow.stream.FastReader;
 
@@ -15,7 +14,9 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -67,14 +68,14 @@ public abstract class Resource {
     }
 
     public String[] readLines(Charset charset) {
-        final StringList lines = new StringList();
+        final List<String> lines = new ArrayList<>();
 
         final FastReader reader = this.reader();
         while(reader.hasNext())
             lines.add(reader.nextLine(charset));
         reader.close();
 
-        return lines.trim().array();
+        return lines.toArray(new String[0]);
     }
 
     public String[] readLines() {

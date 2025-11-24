@@ -1,12 +1,12 @@
 package generaloss.resourceflow.resource;
 
-import generaloss.rawlist.StringList;
 import generaloss.resourceflow.ResUtils;
 import generaloss.resourceflow.stream.ClassFilter;
 import generaloss.resourceflow.stream.StringFilter;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ClasspathResource extends Resource {
@@ -87,12 +87,14 @@ public class ClasspathResource extends Resource {
 
     public String[] listNames(StringFilter nameFilter) {
         this.initEntries();
-        final StringList list = new StringList();
+        final List<String> list = new ArrayList<>();
 
-        entriesHolder.forEach(entry ->
-            list.add(entry.listEntryNames(nameFilter)));
+        entriesHolder.forEach(entry -> {
+            final String[] entryNames = entry.listEntryNames(nameFilter);
+            Collections.addAll(list, entryNames);
+        });
 
-        return list.trim().array();
+        return list.toArray(new String[0]);
     }
 
     public String[] listNames() {
