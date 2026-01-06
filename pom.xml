@@ -5,7 +5,7 @@
 
     <groupId>io.github.generaloss</groupId>
     <artifactId>resource-flow</artifactId>
-    <version>25.11.2</version>
+    <version>26.1.1</version>
     <name>${artifactId}</name>
 
     <description>Unified resource access library. Provides consistent APIs for files, classpath resources, URLs, and ZIP entries with streaming utilities.</description>

@@ -75,7 +75,7 @@ public abstract class Resource {
             lines.add(reader.nextLine(charset));
         reader.close();
 
-        return lines.toArray(new String[0]);
+        return lines.toArray(String[]::new);
     }
 
     public String[] readLines() {

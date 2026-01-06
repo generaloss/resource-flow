@@ -11,8 +11,10 @@ import java.nio.charset.StandardCharsets;
 
 public class FastReader implements Closeable {
 
-    private static final byte EOF = -1;
-    private static final byte NEW_LINE = 10;
+    private static final int EOF = -1;
+
+    private static final byte LF = 10;
+    private static final byte CR = 13;
     private static final byte SPACE = 32;
 
     private final InputStream inputStream;
@@ -78,7 +80,7 @@ public class FastReader implements Closeable {
         while(true) {
             while(pointer < bytesRead) {
                 final byte b = buffer[pointer];
-                if(b != SPACE && b != NEW_LINE) {
+                if(b != SPACE && b != LF && b != CR) {
                     if(i == charBuffer.length)
                         this.doubleCharBufferSize();
                     charBuffer[i++] = buffer[pointer++];
@@ -102,8 +104,20 @@ public class FastReader implements Closeable {
         while(true) {
             while(pointer < bytesRead) {
                 final byte b = buffer[pointer++];
-                if(b == NEW_LINE)
+                if(b == LF)
                     return new String(charBuffer, 0, charPointer, charset);
+
+                if(b == CR) {
+                    if (pointer < bytesRead) {
+                        if (buffer[pointer] == LF)
+                            pointer++;
+                    } else {
+                        this.fillBuffer();
+                        if(pointer < bytesRead)
+                            pointer++;
+                    }
+                    return new String(charBuffer, 0, charPointer, charset);
+                }
 
                 if(charPointer == charBuffer.length)
                     this.doubleCharBufferSize();
@@ -122,7 +136,8 @@ public class FastReader implements Closeable {
     public boolean hasNext() {
         int tempPointer = pointer;
         while(tempPointer < bytesRead) {
-            if(buffer[tempPointer] != SPACE && buffer[tempPointer] != NEW_LINE)
+            final byte b = buffer[tempPointer];
+            if(b != SPACE && b != LF && b != CR)
                 return true;
             tempPointer++;
         }
@@ -159,7 +174,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         int i = 0;
         while((b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z')) {
@@ -176,7 +191,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         int i = 0;
 
@@ -201,7 +216,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         if(b != '"')
             return "";
@@ -250,7 +265,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         if(b == '-') {
             negative = true;
@@ -272,7 +287,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         if(b == '-') {
             negative = true;
@@ -300,7 +315,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         if(b == '-') {
             negative = true;
@@ -329,7 +344,7 @@ public class FastReader implements Closeable {
         byte b;
         do {
             b = this.read();
-        }while(b == SPACE || b == NEW_LINE);
+        }while(b == SPACE || b == LF || b == CR);
 
         int i = 0;
         while((b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z')) {

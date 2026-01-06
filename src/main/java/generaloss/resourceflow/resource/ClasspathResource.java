@@ -22,7 +22,7 @@ public class ClasspathResource extends Resource {
     protected ClasspathResource(ClassLoader classLoader, boolean disableCaching, String entryPath) throws ResourceAccessException {
         this.classLoader = classLoader;
         this.disableCaching = disableCaching;
-        this.entryPath = ResUtils.normalizePath(entryPath);
+        this.entryPath = ResUtils.osGeneralizePath(ResUtils.normalizePath(entryPath));
     }
 
     protected ClasspathResource(ClassLoader classLoader, String entryPath) throws ResourceAccessException {
@@ -119,6 +119,7 @@ public class ClasspathResource extends Resource {
 
     private static Class<?> classByFilename(String classPath) {
         try {
+            classPath = ResUtils.osGeneralizePath(classPath);
             final int extensionStartIndex = (classPath.length() - CLASS_EXTENSION.length());
             final String classPathWithoutExtension = classPath.substring(0, extensionStartIndex);
             final String className = classPathWithoutExtension.replace('/', '.');
