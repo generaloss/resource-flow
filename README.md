@@ -27,7 +27,7 @@ Add the dependency from Maven Central:
 <dependency>
     <groupId>io.github.generaloss</groupId>
     <artifactId>resource-flow</artifactId>
-    <version>25.11.2</version>
+    <version>26.1.1</version>
 </dependency>
 ```
 
