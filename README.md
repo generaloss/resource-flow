@@ -44,7 +44,7 @@ Requirements:
 ``` java
 // Different resource types
 Resource fileRes = Resource.file("config/settings.json");
-Resource internalRes = Resource.internal("defaults.properties");
+Resource internalRes = Resource.internal("/defaults.properties");
 Resource urlRes = Resource.url("https://example.com/data.txt");
 
 // Read content
