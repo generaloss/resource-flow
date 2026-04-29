@@ -11,6 +11,8 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 public class FileResource extends Resource {
 
@@ -132,6 +134,10 @@ public class FileResource extends Resource {
 
     public boolean isFile() {
         return file.isFile();
+    }
+
+    public boolean isSymbolicLink() {
+        return Files.isSymbolicLink(file.toPath());
     }
 
 
@@ -277,6 +283,32 @@ public class FileResource extends Resource {
             resources[i] = this.child(list[i]);
 
         return resources;
+    }
+
+
+    public void cleanDirectory() throws IOException {
+        if(!this.isDirectory())
+            return;
+
+        final Path directory = file.toPath();
+        try (Stream<Path> walk = Files.walk(directory)) {
+            walk.sorted(Comparator.reverseOrder())
+                .filter(path -> !path.equals(directory))
+                .forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch(IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+        } catch (UncheckedIOException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public boolean deleteDirectory() throws IOException {
+        this.cleanDirectory();
+        return this.delete();
     }
 
 
