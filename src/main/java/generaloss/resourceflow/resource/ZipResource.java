@@ -103,7 +103,7 @@ public class ZipResource extends Resource {
         try {
             return file.getInputStream(entry);
         } catch (IOException e) {
-            throw new ResourceAccessException("Cannot open ZIP entry: " + entry.getName(), e);
+            throw new ResourceAccessException("Cannot open ZIP entry '" + entry.getName() + "'.", e);
         }
     }
 

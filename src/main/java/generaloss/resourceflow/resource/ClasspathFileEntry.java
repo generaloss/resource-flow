@@ -30,8 +30,8 @@ class ClasspathFileEntry extends ClasspathEntry {
         try {
             final File file = new File(super.absoluteFilePath);
             return new FileInputStream(file);
-        } catch (IOException e) {
-            throw new ResourceAccessException("Cannot open entry file: " + internalEntryPath, e);
+        } catch (FileNotFoundException e) {
+            throw new ResourceNotFoundException("Cannot open entry file '" + internalEntryPath + "'.", e);
         }
     }
 

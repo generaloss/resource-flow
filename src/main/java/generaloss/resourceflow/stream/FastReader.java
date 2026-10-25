@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class FastReader implements Closeable {
 
@@ -23,8 +24,7 @@ public class FastReader implements Closeable {
     private int pointer, bytesRead;
 
     public FastReader(InputStream inputStream) {
-        if(inputStream == null)
-            throw new IllegalArgumentException("Argument 'inputStream' cannot be null");
+        Objects.requireNonNull(inputStream, "Argument 'inputStream' cannot be null.");
 
         this.inputStream = inputStream;
         this.buffer = new byte[65536];

@@ -58,9 +58,9 @@ public class ClasspathResource extends Resource {
         this.initEntries();
 
         if(entriesHolder.isEmpty())
-            throw new ResourceAccessException("JAR resource does not exist: " + entryPath);
+            throw new ResourceNotFoundException("JAR resource does not exist '" + entryPath + "'.");
         if(entriesHolder.isDirectory())
-            throw new ResourceAccessException("Cannot create InputStream for directory: " + entryPath);
+            throw new ResourceAccessException("Cannot create InputStream for directory '" + entryPath + "'.");
 
         final ClasspathEntry entry = entriesHolder.getEntries()[0];
         return entry.openInputStream();
@@ -80,7 +80,7 @@ public class ClasspathResource extends Resource {
 
     public ClasspathResource child(String name) {
         if(!this.isDirectory())
-            throw new ResourceAccessException("Cannot get child of non-directory resource: " + entryPath);
+            throw new ResourceAccessException("Cannot get child of non-directory resource '" + entryPath + "'.");
         return new ClasspathResource(classLoader, entryPath + name);
     }
 

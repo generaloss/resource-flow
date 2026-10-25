@@ -187,7 +187,7 @@ public class FileResource extends Resource {
         try {
             return new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            throw new ResourceAccessException("Cannot open file: " + file.getName(), e);
+            throw new ResourceNotFoundException("Cannot open file '" + file.getName() + "'.", e);
         }
     }
 
@@ -336,7 +336,7 @@ public class FileResource extends Resource {
         try {
             return new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            throw new ResourceAccessException("Cannot open file: " + file.getName(), e);
+            throw new ResourceNotFoundException("Cannot open file: " + file.getName(), e);
         }
     }
 

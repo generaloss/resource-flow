@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -178,38 +179,32 @@ public abstract class Resource {
 
 
     public static FileResource file(String pathStr) {
-        if(pathStr == null)
-            throw new IllegalArgumentException("Argument 'pathStr' cannot be null");
+        Objects.requireNonNull(pathStr, "Argument 'pathStr' cannot be null.");
         return new FileResource(pathStr);
     }
 
     public static FileResource file(File file) {
-        if(file == null)
-            throw new IllegalArgumentException("Argument 'file' cannot be null");
+        Objects.requireNonNull(file, "Argument 'file' cannot be null.");
         return new FileResource(file);
     }
 
     public static FileResource file(Path path) {
-        if(path == null)
-            throw new IllegalArgumentException("Argument 'path' cannot be null");
+        Objects.requireNonNull(path, "Argument 'path' cannot be null.");
         return new FileResource(path);
     }
 
     public static FileResource file(File parent, String child) {
-        if(child == null)
-            throw new IllegalArgumentException("Argument 'child' cannot be null");
+        Objects.requireNonNull(child, "Argument 'child' cannot be null.");
         return new FileResource(parent, child);
     }
 
     public static FileResource file(URI uri) {
-        if(uri == null)
-            throw new IllegalArgumentException("Argument 'uri' cannot be null");
+        Objects.requireNonNull(uri, "Argument 'uri' cannot be null.");
         return new FileResource(uri);
     }
 
     public static FileResource[] file(String... paths) {
-        if(paths == null)
-            throw new IllegalArgumentException("Argument 'paths' cannot be null");
+        Objects.requireNonNull(paths, "Argument 'paths' cannot be null.");
 
         final FileResource[] arr = new FileResource[paths.length];
         for(int i = 0; i < arr.length; i++)
@@ -219,8 +214,7 @@ public abstract class Resource {
     }
 
     public static FileResource[] file(File... files) {
-        if(files == null)
-            throw new IllegalArgumentException("Argument 'files' cannot be null");
+        Objects.requireNonNull(files, "Argument 'files' cannot be null.");
 
         final FileResource[] arr = new FileResource[files.length];
         for(int i = 0; i < arr.length; i++)
@@ -230,8 +224,7 @@ public abstract class Resource {
     }
 
     public static FileResource[] file(Path... paths) {
-        if(paths == null)
-            throw new IllegalArgumentException("Argument 'paths' cannot be null");
+        Objects.requireNonNull(paths, "Argument 'paths' cannot be null.");
 
         final FileResource[] arr = new FileResource[paths.length];
         for(int i = 0; i < arr.length; i++)
@@ -241,8 +234,7 @@ public abstract class Resource {
     }
 
     public static FileResource[] file(URI... urls) {
-        if(urls == null)
-            throw new IllegalArgumentException("Argument 'urls' cannot be null");
+        Objects.requireNonNull(urls, "Argument 'urls' cannot be null.");
 
         final FileResource[] arr = new FileResource[urls.length];
         for(int i = 0; i < arr.length; i++)
@@ -253,38 +245,32 @@ public abstract class Resource {
 
 
     public static TempFileResource temp(String prefix, String suffix, File directory) throws IOException {
-        if(prefix == null)
-            throw new IllegalArgumentException("Argument 'prefix' cannot be null");
+        Objects.requireNonNull(prefix, "Argument 'prefix' cannot be null.");
         return new TempFileResource(prefix, suffix, directory);
     }
 
     public static TempFileResource temp(String prefix, String suffix) throws IOException {
-        if(prefix == null)
-            throw new IllegalArgumentException("Argument 'prefix' cannot be null");
+        Objects.requireNonNull(prefix, "Argument 'prefix' cannot be null.");
         return new TempFileResource(prefix, suffix);
     }
 
 
-    public static InternalResource internal(Class<?> classLoader, String path) {
-        if(classLoader == null)
-            throw new IllegalArgumentException("Argument 'classLoader' cannot be null");
-        if(path == null)
-            throw new IllegalArgumentException("Argument 'path' cannot be null");
-
-        return new InternalResource(classLoader, path);
+    public static InternalResource internal(Class<?> resourceClass, String path) {
+        Objects.requireNonNull(resourceClass, "Argument 'resourceClass' cannot be null.");
+        Objects.requireNonNull(path, "Argument 'path' cannot be null.");
+        return new InternalResource(resourceClass, path);
     }
 
     public static InternalResource internal(String path) {
         return internal(InternalResource.class, path);
     }
 
-    public static InternalResource[] internal(Class<?> classLoader, String... paths) {
-        if(paths == null)
-            throw new IllegalArgumentException("Argument 'paths' cannot be null");
+    public static InternalResource[] internal(Class<?> resourceClass, String... paths) {
+        Objects.requireNonNull(paths, "Argument 'paths' cannot be null.");
 
         final InternalResource[] arr = new InternalResource[paths.length];
         for(int i = 0; i < arr.length; i++)
-            arr[i] = internal(classLoader, paths[i]);
+            arr[i] = internal(resourceClass, paths[i]);
 
         return arr;
     }
@@ -295,20 +281,17 @@ public abstract class Resource {
 
 
     public static URLResource url(URL url) {
-        if(url == null)
-            throw new IllegalArgumentException("Argument 'url' cannot be null");
+        Objects.requireNonNull(url, "Argument 'url' cannot be null.");
         return new URLResource(url);
     }
 
     public static URLResource url(String url) throws MalformedURLException {
-        if(url == null)
-            throw new IllegalArgumentException("Argument 'url' cannot be null");
+        Objects.requireNonNull(url, "Argument 'url' cannot be null.");
         return new URLResource(url);
     }
 
     public static URLResource[] url(URL... urls) {
-        if(urls == null)
-            throw new IllegalArgumentException("Argument 'urls' cannot be null");
+        Objects.requireNonNull(urls, "Argument 'urls' cannot be null.");
 
         final URLResource[] arr = new URLResource[urls.length];
         for(int i = 0; i < arr.length; i++)
@@ -318,8 +301,7 @@ public abstract class Resource {
     }
 
     public static URLResource[] url(String... urls) throws MalformedURLException {
-        if(urls == null)
-            throw new IllegalArgumentException("Argument 'urls' cannot be null");
+        Objects.requireNonNull(urls, "Argument 'urls' cannot be null.");
 
         final URLResource[] arr = new URLResource[urls.length];
         for(int i = 0; i < arr.length; i++)
@@ -330,17 +312,14 @@ public abstract class Resource {
 
 
     public static ZipResource zip(ZipFile zipFile, ZipEntry entry) {
-        if(zipFile == null)
-            throw new IllegalArgumentException("Argument 'zipFile' cannot be null");
-        if(entry == null)
-            throw new IllegalArgumentException("Argument 'entry' cannot be null");
+        Objects.requireNonNull(zipFile, "Argument 'zipFile' cannot be null.");
+        Objects.requireNonNull(entry, "Argument 'entry' cannot be null.");
 
         return new ZipResource(zipFile, entry);
     }
 
     public static ZipResource[] zip(ZipFile zipFile) {
-        if(zipFile == null)
-            throw new IllegalArgumentException("Argument 'zipFile' cannot be null");
+        Objects.requireNonNull(zipFile, "Argument 'zipFile' cannot be null.");
 
         final ZipResource[] arr = new ZipResource[zipFile.size()];
         final Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -352,11 +331,8 @@ public abstract class Resource {
 
 
     public static ClasspathResource classpath(ClassLoader classLoader, boolean disableCaching, String entryPath) {
-        if(classLoader == null)
-            throw new IllegalArgumentException("Argument 'classLoader' cannot be null");
-        if(entryPath == null)
-            throw new IllegalArgumentException("Argument 'path' cannot be null");
-
+        Objects.requireNonNull(classLoader, "Argument 'classLoader' cannot be null.");
+        Objects.requireNonNull(entryPath, "Argument 'entryPath' cannot be null.");
         return new ClasspathResource(classLoader, disableCaching, entryPath);
     }
 
@@ -369,8 +345,7 @@ public abstract class Resource {
     }
 
     public static ClasspathResource[] classpath(ClassLoader classLoader, boolean disableCaching, String... entriesPaths) {
-        if(entriesPaths == null)
-            throw new IllegalArgumentException("Argument 'entriesPaths' cannot be null");
+        Objects.requireNonNull(entriesPaths, "entriesPaths 'pathStr' cannot be null.");
 
         final ClasspathResource[] arr = new ClasspathResource[entriesPaths.length];
         for(int i = 0; i < arr.length; i++)

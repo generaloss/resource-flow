@@ -27,8 +27,8 @@ class ClasspathZipEntry extends ClasspathEntry {
 
             final ZipEntry zipEntry = zipFile.getEntry(super.internalEntryPath);
             if(zipEntry == null)
-                throw new ResourceAccessException("ZIP entry does not exist: " +
-                        super.absoluteFilePath + "!" + super.internalEntryPath);
+                throw new ResourceNotFoundException("ZIP entry '" +
+                        super.absoluteFilePath + "!" + super.internalEntryPath + "' does not exist.");
 
             final InputStream inputStream = zipFile.getInputStream(zipEntry);
             return new FilterInputStream(inputStream) {
@@ -40,8 +40,8 @@ class ClasspathZipEntry extends ClasspathEntry {
             };
 
         } catch (IOException e) {
-            throw new ResourceAccessException("Cannot open ZIP entry: " +
-                    super.absoluteFilePath + "!" + super.internalEntryPath, e);
+            throw new ResourceAccessException("Cannot open ZIP entry '" +
+                    super.absoluteFilePath + "!" + super.internalEntryPath + "'.", e);
         }
     }
 

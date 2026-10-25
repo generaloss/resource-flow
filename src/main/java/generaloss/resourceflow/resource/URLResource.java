@@ -41,7 +41,7 @@ public class URLResource extends Resource {
         try {
             final InputStream stream = url.openStream();
             if(stream == null)
-                throw new ResourceAccessException("Cannot open URL resource: " + url);
+                throw new ResourceNotFoundException("Cannot open URL resource '" + url + "'.");
 
             return stream;
         } catch (IOException e) {
