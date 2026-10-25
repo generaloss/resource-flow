@@ -2,6 +2,8 @@ package generaloss.resourceflow.resource;
 
 public class ResourceAccessException extends RuntimeException {
 
+    public ResourceAccessException() { }
+
     public ResourceAccessException(String message) {
         super(message);
     }
