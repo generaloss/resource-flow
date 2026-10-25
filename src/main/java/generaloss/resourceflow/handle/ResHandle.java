@@ -1,7 +1,6 @@
 package generaloss.resourceflow.handle;
 
 import generaloss.resourceflow.Disposable;
-import generaloss.resourceflow.resource.ResourceSource;
 
 public abstract class ResHandle<K, H> implements Disposable {
 
@@ -22,7 +21,7 @@ public abstract class ResHandle<K, H> implements Disposable {
     }
 
 
-    abstract public void load(ResourceSource source, String path);
+    abstract public void load(ResourceProvider provider, String path);
 
     abstract public H resource();
 
