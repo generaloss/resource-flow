@@ -4,14 +4,16 @@ import generaloss.resourceflow.ResUtils;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class InternalResource extends Resource {
 
     private final String path;
-    private final Class<?> classLoader;
+    private final Class<?> resourceClass;
 
-    protected InternalResource(Class<?> classLoader, String path) {
-        this.classLoader = classLoader;
+    protected InternalResource(Class<?> resourceClass, String path) {
+        this.resourceClass = resourceClass;
         this.path = ResUtils.osGeneralizePath(path);
     }
 
@@ -24,22 +26,64 @@ public class InternalResource extends Resource {
         return path;
     }
 
-    public Class<?> classLoader() {
-        return classLoader;
+    public Class<?> resourceClass() {
+        return resourceClass;
     }
 
     @Override
     public InputStream inStream() throws ResourceAccessException {
-        final InputStream stream = classLoader.getResourceAsStream(path);
-        if(stream == null)
-            throw new ResourceAccessException("Internal resource does not exist: " + path);
-        return stream;
+        for(InternalResourceSource source : SOURCES) {
+            try {
+                return source.inStream(resourceClass, path);
+            } catch (ResourceNotFoundException ignored) { }
+        }
+
+        throw new ResourceNotFoundException("Cannot open internal resource '" + path + "'.");
     }
 
     @Override
     public boolean exists() {
-        final URL url = classLoader.getResource(path);
-        return (url != null);
+        for(InternalResourceSource source : SOURCES)
+            if(source.exists(resourceClass, path))
+                return true;
+        return false;
+    }
+
+
+    private static final List<InternalResourceSource> SOURCES = new CopyOnWriteArrayList<>();
+
+    public static synchronized void registerSource(InternalResourceSource source) {
+        Objects.requireNonNull(source, "Argument 'source' cannot be null.");
+        if(SOURCES.contains(source))
+            return;
+        SOURCES.add(source);
+        SOURCES.sort(Comparator.comparingInt(InternalResourceSource::getPriority).reversed());
+    }
+
+    static {
+        registerSource(new DefaultSource());
+    }
+
+    private static class DefaultSource extends InternalResourceSource {
+
+        public DefaultSource() {
+            super(0);
+        }
+
+        @Override
+        public InputStream inStream(Class<?> resourceClass, String path) throws ResourceAccessException {
+            final InputStream stream = resourceClass.getResourceAsStream(path);
+            if(stream == null)
+                throw new ResourceNotFoundException();
+            return stream;
+        }
+
+        @Override
+        public boolean exists(Class<?> resourceClass, String path) {
+            final URL url = resourceClass.getResource(path);
+            return (url != null);
+        }
+
     }
 
 }
